@@ -1,19 +1,15 @@
-// Simple hashing function that works consistently
 function simpleHash(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
         hash = (hash << 5) - hash + char;
-        hash = hash & hash; // Convert to 32bit integer
+        hash = hash & hash; 
     }
     return hash.toString();
 }
 
-// Precomputed hashes (replace these with your own)
-// To generate: put your desired username/password in the simpleHash() function
-// Example: simpleHash('admin') and simpleHash('yourpassword')
-const CORRECT_USERNAME_HASH = "96354"; // hash of 'admin'
-const CORRECT_PASSWORD_HASH = "-1386618049" // hash of 'password'
+const CORRECT_USERNAME_HASH = "96354";
+const CORRECT_PASSWORD_HASH = "-1386618049"
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
@@ -27,11 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         
-        // Hash the entered credentials
         const usernameHash = simpleHash(username);
         const passwordHash = simpleHash(password);
         
-        // Compare with stored hashes
         if (usernameHash === CORRECT_USERNAME_HASH && passwordHash === CORRECT_PASSWORD_HASH) {
             loginContainer.style.display = 'none';
             adminPanel.style.display = 'block';
@@ -43,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Admin control functions
 function setDay(day) {
     localStorage.setItem('lfcsd_manualDay', day);
     localStorage.setItem('lfcsd_autoMode', 'false');
@@ -60,7 +53,6 @@ function resetAuto() {
     alert('Reset to automatic day detection. Changes will appear on the main page.');
 }
 
-// Make functions available globally
 window.setDay = setDay;
 window.setSchedule = setSchedule;
 window.resetAuto = resetAuto;
