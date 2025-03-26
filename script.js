@@ -31,12 +31,33 @@ function updateDayDisplay() {
         return;
     }
     
-    // Calculate automatic day (alternating between Day 1 and Day 2 on weekdays)
-    const startDate = new Date('2025-03-26'); // Adjust this to a known Day 1
-    const diffTime = today - startDate;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const dayNumber = (diffDays % 2) + 1; // Alternates between 1 and 2
-    
-    dayTextElement.textContent = `Day ${dayNumber}`;
-    specialScheduleElement.innerHTML = '<span class="schedule-badge">Regular Day</span>';
+    // Fetch current day/schedule from server
+    fetch('get-day.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.manual_day) {
+                dayTextElement.textContent = `Day ${data.manual_day}`;
+            } else {
+                // Calculate automatic day if no manual override
+                const startDate = new Date('2023-09-05'); // Adjust this to a known Day 1
+                const diffTime = today - startDate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const dayNumber = (diffDays % 2) + 1; // Alternates between 1 and 2
+                dayTextElement.textContent = `Day ${dayNumber}`;
+            }
+            
+            specialScheduleElement.innerHTML = data.special_schedule === 'Regular Day' 
+                ? '<span class="schedule-badge">Regular Day</span>'
+                : `<span class="schedule-badge">${data.special_schedule}</span>`;
+        })
+        .catch(error => {
+            console.error('Error fetching day data:', error);
+            // Fallback to automatic calculation
+            const startDate = new Date('2023-09-05');
+            const diffTime = today - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const dayNumber = (diffDays % 2) + 1;
+            dayTextElement.textContent = `Day ${dayNumber}`;
+            specialScheduleElement.innerHTML = '<span class="schedule-badge">Regular Day</span>';
+        });
 }
