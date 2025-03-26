@@ -14,31 +14,35 @@ document.addEventListener('DOMContentLoaded', function() {
   const loginContainer = document.getElementById('loginContainer');
   const adminPanel = document.getElementById('adminPanel');
   
-  // Admin login
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+ // Admin Login Function
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  try {
+    // 1. Sign in with email/password
+    await firebase.auth().signInWithEmailAndPassword(email, password);
     
-    try {
-      await auth.signInWithEmailAndPassword(email, password);
-      const user = auth.currentUser;
+    // 2. Verify admin status (using custom claims)
+    const user = firebase.auth().currentUser;
+    if (user) {
+      const token = await user.getIdTokenResult();
       
-      // Verify admin status (using custom claims)
-      if (user) {
-        const token = await user.getIdTokenResult();
-        if (token.claims.admin) {
-          loginContainer.style.display = 'none';
-          adminPanel.style.display = 'block';
-        } else {
-          throw new Error('Not an admin');
-        }
+      if (token.claims.admin) {
+        // Show admin panel
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+      } else {
+        throw new Error('This account is not an admin');
       }
-    } catch (error) {
-      alert('Login failed: ' + error.message);
-      auth.signOut();
     }
-  });
+  } catch (error) {
+    alert('Login failed: ' + error.message);
+    firebase.auth().signOut(); // Clear invalid login
+  }
+});
   
   // Admin functions
   window.setDay = async (day) => {
