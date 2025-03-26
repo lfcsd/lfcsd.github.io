@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (data && !data.autoMode && data.manualDay !== null) {
       dayTextElement.textContent = `Day ${data.manualDay}`;
     } else {
-      const startDate = new Date('2023-09-05'); // Adjust to your known Day 1
+      const startDate = new Date('2025-03-26'); // Adjust to your known Day 1
       const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
       dayTextElement.textContent = `Day ${(diffDays % 2) + 1}`;
     }
