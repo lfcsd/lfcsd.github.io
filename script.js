@@ -32,7 +32,7 @@ function updateDayDisplay() {
     }
     
     // Calculate automatic day (alternating between Day 1 and Day 2 on weekdays)
-    const startDate = new Date('2023-09-05'); // Adjust this to a known Day 1
+    const startDate = new Date('2025-03-26'); // Adjust this to a known Day 1
     const diffTime = today - startDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const dayNumber = (diffDays % 2) + 1; // Alternates between 1 and 2
