@@ -140,3 +140,57 @@ body {
         height: 100px;
     }
 }
+
+/* Add these to your existing styles */
+
+/* Hamburger Menu Styles */
+.menu-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(128, 128, 128, 0.65);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: background 0.3s;
+}
+
+.menu-btn:hover {
+  background: rgba(128, 128, 128, 0.85);
+}
+
+.dropdown-menu {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background: rgba(128, 128, 128, 0.85);
+  border-radius: 10px;
+  padding: 10px 0;
+  display: none;
+  flex-direction: column;
+  min-width: 180px;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-menu.show {
+  display: flex;
+}
+
+.menu-item {
+  padding: 10px 20px;
+  color: white;
+  text-decoration: none;
+  transition: background 0.3s;
+  border-radius: 5px;
+  margin: 0 5px;
+}
+
+.menu-item:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
