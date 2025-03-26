@@ -6,10 +6,9 @@ async function sha256(message) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Hardcoded hashed credentials (replace with your own)
 const ADMIN_CREDS = {
-    username: '4d6e621a8d9ccbc9a8e0a6b5e5e5a5e5e5a5e5a5e5a5e5a5e5a5e5a5e5a5e5', // hash of 'admin'
-    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8' // hash of 'password'
+    username: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
+    password: 'dfeac2b4de01e15d7e2a0c93f2c55a5178c824c0d21d6bc8c298b5b46ef31ded'
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -35,7 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-// Admin functions
 function setDay(day) {
     localStorage.setItem('lfcsd_manualDay', day);
     localStorage.setItem('lfcsd_autoMode', 'false');
