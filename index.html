@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFCSD Day Indicator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="logo.png" alt="School Logo" class="logo" id="logo">
+        </div>
+        <div class="day-container">
+            <div class="special-schedule" id="specialSchedule">Regular Day</div>
+            <div class="day-text" id="dayText">Day 1</div>
+        </div>
+    </div>
 
+    <!-- Admin Panel (only visible at admin.lfcsddays.com) -->
+    <div class="admin-panel" id="adminPanel">
+        <h2>Admin Controls</h2>
+        <div class="admin-buttons">
+            <button class="admin-btn" onclick="setDay(1)">Day 1</button>
+            <button class="admin-btn" onclick="setDay(2)">Day 2</button>
+            <button class="admin-btn" onclick="setSpecialSchedule('Half-Day')">Half-Day</button>
+            <button class="admin-btn" onclick="setSpecialSchedule('2hr Delay')">2 Hour Delay</button>
+            <button class="admin-btn" onclick="setSpecialSchedule('Regular Day')">Regular Day</button>
+            <button class="admin-btn" onclick="resetToAuto()">Reset to Auto</button>
+        </div>
+    </div>
+</body>
+</html>
