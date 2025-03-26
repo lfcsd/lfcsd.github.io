@@ -11,56 +11,47 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
 
-    // Login form submission
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    
+    if (!email || !password) {
+        alert("Please enter both email and password");
+        return;
+    }
+
+    try {
+        loginForm.querySelector('button').disabled = true;
+        loginForm.querySelector('button').textContent = 'Logging in...';
         
-        const email = emailInput.value;
-        const password = passwordInput.value;
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const token = await userCredential.user.getIdTokenResult();
         
-        try {
-            // Show loading state
-            loginForm.querySelector('button').textContent = 'Logging in...';
-            
-            // Sign in with email/password
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            
-            // Check if user has admin privileges
-            const token = await user.getIdTokenResult();
-            if (!token.claims.admin) {
-                throw new Error('This account is not an administrator');
-            }
-            
-            // Success - show admin panel
-            loginContainer.style.display = 'none';
-            adminPanel.style.display = 'block';
-            
-        } catch (error) {
-            // Handle errors
-            let errorMessage = 'Login failed: ';
-            switch (error.code) {
-                case 'auth/invalid-email':
-                    errorMessage += 'Invalid email address';
-                    break;
-                case 'auth/user-disabled':
-                    errorMessage += 'Account disabled';
-                    break;
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    errorMessage += 'Invalid email or password';
-                    break;
-                default:
-                    errorMessage += error.message;
-            }
-            
-            alert(errorMessage);
-            auth.signOut();
-        } finally {
-            // Reset login button
-            loginForm.querySelector('button').textContent = 'Login';
+        if (!token.claims.admin) {
+            throw new Error("This account doesn't have admin privileges");
         }
-    });
+        
+        loginContainer.style.display = 'none';
+        adminPanel.style.display = 'block';
+        
+    } catch (error) {
+        let message = "Login failed: ";
+        if (error.code === 'auth/invalid-email') {
+            message += "Invalid email format";
+        } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+            message += "Invalid email or password";
+        } else {
+            message += error.message;
+        }
+        alert(message);
+        await firebase.auth().signOut();
+    } finally {
+        loginForm.querySelector('button').disabled = false;
+        loginForm.querySelector('button').textContent = 'Login';
+    }
+});
 
     // Admin control functions
     async function updateSettings(updates) {
