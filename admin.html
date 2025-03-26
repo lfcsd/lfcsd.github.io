@@ -1,97 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LFCSD Days Panel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <script src="admin.js" defer></script>
-    <style>
-        body {
-            background: linear-gradient(135deg, #6a0dad, #8a2be2);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            font-family: 'Lexend', sans-serif;
-            color: white;
-        }
-        .login-container {
-            background: rgba(0,0,0,0.7);
-            padding: 2rem;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-        }
-        .form-group { 
-            margin-bottom: 1rem; 
-        }
-        input { 
-            padding: 0.5rem; 
-            width: 100%;
-            margin-top: 0.3rem;
-            border-radius: 4px;
-            border: none;
-        }
-        button {
-            padding: 0.5rem 1rem;
-            background: #8a2be2;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Lexend', sans-serif;
-            margin-top: 1rem;
-            width: 100%;
-        }
-        button:hover {
-            background: #6a0dad;
-        }
-        .admin-panel {
-            text-align: center;
-        }
-        .admin-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .error {
-            color: #ff6b6b;
-            margin-bottom: 1rem;
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LFCSD Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    .login-container {
+      background: rgba(0,0,0,0.7);
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 2rem auto;
+      color: white;
+    }
+    .admin-panel {
+      display: none;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container" id="loginContainer">
-        <h2>Admin Login</h2>
-        <div class="error" id="errorMessage"></div>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" required>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-    </div>
+  <div class="login-container" id="loginContainer">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Email: <input type="email" id="email" required></label>
+      </div>
+      <div class="form-group">
+        <label>Password: <input type="password" id="password" required></label>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+  </div>
 
-    <div class="admin-panel" id="adminPanel" style="display:none;">
-        <h2>Admin Controls</h2>
-        <div class="admin-buttons">
-            <button onclick="setDay(1)">Day 1</button>
-            <button onclick="setDay(2)">Day 2</button>
-            <button onclick="setSchedule('Half-Day')">Half-Day</button>
-            <button onclick="setSchedule('2hr Delay')">2hr Delay</button>
-            <button onclick="setSchedule('Regular Day')">Regular Day</button>
-            <button onclick="resetAuto()">Reset to Auto</button>
-        </div>
+  <div class="admin-panel" id="adminPanel">
+    <h2>Admin Controls</h2>
+    <div class="admin-buttons">
+      <button onclick="setDay(1)">Day 1</button>
+      <button onclick="setDay(2)">Day 2</button>
+      <button onclick="setSchedule('Half-Day')">Half-Day</button>
+      <button onclick="setSchedule('2hr Delay')">2hr Delay</button>
+      <button onclick="setSchedule('Regular Day')">Regular Day</button>
+      <button onclick="resetAuto()">Reset to Auto</button>
     </div>
+  </div>
+  <script src="admin.js"></script>
 </body>
 </html>
