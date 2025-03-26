@@ -11,6 +11,7 @@ body {
     animation: gradientFlow 15s ease infinite;
     color: white;
     overflow: hidden;
+    position: relative;
 }
 
 @keyframes gradientFlow {
@@ -24,6 +25,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 40px;
+    z-index: 1;
 }
 
 .logo {
@@ -48,47 +50,79 @@ body {
     font-size: 1.5rem;
     margin-bottom: 10px;
     text-align: center;
-    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Admin Panel Styles */
-.admin-panel {
+.schedule-badge {
+    background: rgba(128, 128, 128, 0.65);
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+/* Menu Button Styles */
+.menu-btn {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.7);
-    padding: 20px;
-    border-radius: 10px;
-    display: none;
-}
-
-.admin-panel h2 {
-    margin-top: 0;
-    color: white;
-    text-align: center;
-}
-
-.admin-buttons {
+    top: 20px;
+    right: 20px;
+    background: rgba(128, 128, 128, 0.65);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
     justify-content: center;
-}
-
-.admin-btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background: #8a2be2;
-    color: white;
-    font-family: 'Lexend', sans-serif;
+    align-items: center;
     cursor: pointer;
+    z-index: 100;
     transition: background 0.3s;
 }
 
-.admin-btn:hover {
-    background: #6a0dad;
+.menu-btn:hover {
+    background: rgba(128, 128, 128, 0.85);
+}
+
+.dropdown-menu {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background: rgba(128, 128, 128, 0.85);
+    border-radius: 10px;
+    padding: 10px 0;
+    display: none;
+    flex-direction: column;
+    min-width: 180px;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-menu.show {
+    display: flex;
+}
+
+.menu-item {
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background 0.3s;
+    border-radius: 5px;
+    margin: 0 5px;
+}
+
+.menu-item:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Footer Styles */
+.footer {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: white;
+    opacity: 0.8;
+    font-family: 'Lexend', sans-serif;
 }
 
 /* Responsive adjustments */
