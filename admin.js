@@ -1,3 +1,12 @@
+function setToNull() {
+  firebase.firestore()
+    .collection("settings").doc("current")
+    .update({
+      manualDay: null,
+      lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const auth = firebase.auth();
   const db = firebase.firestore();
