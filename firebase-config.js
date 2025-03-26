@@ -12,10 +12,13 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase
     measurementId: "G-7NPR8M9T6C"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-window.firebase = { auth, db };
+// Initialize services
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Make available globally
+window.firebaseAuth = auth;
+window.firebaseDb = db;
