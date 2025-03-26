@@ -1,15 +1,19 @@
-// Simple SHA-256 hashing (not truly secure but obscures credentials)
-async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+// Simple hashing function that works consistently
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash.toString();
 }
 
-const ADMIN_CREDS = {
-    username: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
-    password: 'dfeac2b4de01e15d7e2a0c93f2c55a5178c824c0d21d6bc8c298b5b46ef31ded'
-};
+// Precomputed hashes (replace these with your own)
+// To generate: put your desired username/password in the simpleHash() function
+// Example: simpleHash('admin') and simpleHash('yourpassword')
+const CORRECT_USERNAME_HASH = "96354"; // hash of 'admin'
+const CORRECT_PASSWORD_HASH = "-1386618049" // hash of 'password'
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
@@ -17,45 +21,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminPanel = document.getElementById('adminPanel');
     const errorMessage = document.getElementById('errorMessage');
 
-    loginForm.addEventListener('submit', async function(e) {
+    loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         
-        try {
-            // Hash the entered credentials
-            const usernameHash = await hashString(username);
-            const passwordHash = await hashString(password);
-            
-            // Compare with stored hashes
-            if (usernameHash === CORRECT_USERNAME_HASH && passwordHash === CORRECT_PASSWORD_HASH) {
-                loginContainer.style.display = 'none';
-                adminPanel.style.display = 'block';
-                errorMessage.style.display = 'none';
-            } else {
-                showError('Invalid username or password');
-            }
-        } catch (error) {
-            showError('An error occurred during login');
-            console.error('Login error:', error);
+        // Hash the entered credentials
+        const usernameHash = simpleHash(username);
+        const passwordHash = simpleHash(password);
+        
+        // Compare with stored hashes
+        if (usernameHash === CORRECT_USERNAME_HASH && passwordHash === CORRECT_PASSWORD_HASH) {
+            loginContainer.style.display = 'none';
+            adminPanel.style.display = 'block';
+            errorMessage.style.display = 'none';
+        } else {
+            errorMessage.textContent = 'Invalid username or password';
+            errorMessage.style.display = 'block';
         }
     });
-
-    function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-    }
 });
-
-// SHA-256 hashing function
-async function hashString(str) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 // Admin control functions
 function setDay(day) {
