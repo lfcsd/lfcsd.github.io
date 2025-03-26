@@ -7,10 +7,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebase-config.js"></script>
+  
+  <!-- Firebase SDK v9 (modern modular version) -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+    authDomain: "lfcsd-days.firebaseapp.com",
+    projectId: "lfcsd-days",
+    storageBucket: "lfcsd-days.firebasestorage.app",
+    messagingSenderId: "520576481150",
+    appId: "1:520576481150:web:b08a50be7b0d15e113e52f",
+    measurementId: "G-7NPR8M9T6C"
+  };
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    // Make available to other scripts
+    window.firebaseApp = app;
+    window.db = db;
+  </script>
 </head>
 <body>
   <!-- Hamburger Menu Button -->
