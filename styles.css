@@ -1,1 +1,108 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lexend', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #6a0dad, #8a2be2, #9370db, #8a2be2, #6a0dad);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+    color: white;
+    overflow: hidden;
+}
 
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+.logo {
+    height: 150px;
+    width: auto;
+}
+
+.day-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.day-text {
+    font-size: 6rem;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.special-schedule {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    text-align: center;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Admin Panel Styles */
+.admin-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+}
+
+.admin-panel h2 {
+    margin-top: 0;
+    color: white;
+    text-align: center;
+}
+
+.admin-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.admin-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background: #8a2be2;
+    color: white;
+    font-family: 'Lexend', sans-serif;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.admin-btn:hover {
+    background: #6a0dad;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .day-text {
+        font-size: 4rem;
+    }
+    
+    .logo {
+        height: 100px;
+    }
+}
