@@ -1,9 +1,16 @@
- document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
   const auth = firebase.auth();
-  const db = firebase.firestore();
   const loginForm = document.getElementById('loginForm');
   const loginContainer = document.getElementById('loginContainer');
   const adminPanel = document.getElementById('adminPanel');
+
+
+ // DOM Elements
+  const loginForm = document.getElementById('loginForm');
+  const loginContainer = document.getElementById('loginContainer');
+  const adminPanel = document.getElementById('adminPanel');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
 
   // Login handler
   loginForm.addEventListener('submit', async function(e) {
@@ -77,22 +84,4 @@ async function resetAuto(type) {
   } catch (error) {
     alert(`Error resetting ${type}: ` + error.message);
   }
-  // ======================
-  // 4. AUTO-LOGIN CHECK
-  // ======================
-  auth.onAuthStateChanged(async function(user) {
-    if (user) {
-      try {
-        const token = await user.getIdTokenResult();
-        if (token.claims.admin) {
-          loginContainer.style.display = 'none';
-          adminPanel.style.display = 'block';
-          currentDayButtons.style.display = 'block';
-          nextDayButtons.style.display = 'block';
-        }
-      } catch (error) {
-        console.error("Auth check error:", error);
-      }
-    }
-  });
-});
+}
