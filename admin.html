@@ -6,107 +6,99 @@
   <title>LFCSD Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Firebase SDK v9 (modular version) - ONLY INITIALIZATION -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    window.firebase = { 
+      db,
+      app,
+      firestore: { getFirestore }
+    };
+    
+    console.log("Firebase initialized successfully");
+  </script>
+
   <style>
-    /* Base Styles */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Lexend', sans-serif;
-      background: linear-gradient(135deg, #6a0dad, #8a2be2);
-      color: white;
-      min-height: 100vh;
-    }
 
-    /* Login Container */
-    .login-container {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 400px;
-      margin: 50px auto;
-      text-align: center;
-    }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Lexend', sans-serif;
+  background: linear-gradient(135deg, #6a0dad, #8a2be2);
+  color: white;
+  min-height: 100vh;
+}
 
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
+.login-container, .admin-panel {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: 20px auto;
+}
 
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-    }
+.admin-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
 
-    .form-group input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      font-family: 'Lexend', sans-serif;
-    }
+.admin-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
 
-    .login-btn {
-      width: 100%;
-      padding: 10px;
-      background: #8a2be2;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: 'Lexend', sans-serif;
-      transition: background 0.3s;
-    }
+.admin-btn {
+  padding: 10px 15px;
+  background: #8a2be2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
 
-    .login-btn:hover {
-      background: #6a0dad;
-    }
+.admin-btn:hover {
+  background: #6a0dad;
+}
 
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+}
     .error {
       color: #ff6b6b;
       margin-bottom: 15px;
-    }
-
-    /* Admin Panel */
-    .admin-panel {
-      display: none;
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .admin-section {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
     }
 
     .admin-section h2 {
       margin-top: 0;
       border-bottom: 1px solid #8a2be2;
       padding-bottom: 10px;
-    }
-
-    .admin-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .admin-btn {
-      padding: 10px 15px;
-      background: #8a2be2;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: 'Lexend', sans-serif;
-      transition: background 0.3s;
-    }
-
-    .admin-btn:hover {
-      background: #6a0dad;
     }
 
     .logout-btn {
@@ -251,28 +243,6 @@ function setDay(day, type) {
     }
 
     function resetToAuto(type) {
-      updateSettings({
-        manualDay: null,
-        schedule: 'Regular Day',
-        autoMode: true
-      }, type === 'current' ? 'settings' : 'nextDaySettings');
-    }
-
-function setDay(day, next) {
-      updateSettings({
-        manualDay: day,
-        autoMode: false
-      }, type === 'current' ? 'settings' : 'nextDaySettings');
-    }
-
-    function setSchedule(schedule, next) {
-      updateSettings({
-        schedule: schedule,
-        autoMode: schedule === 'Regular Day'
-      }, type === 'current' ? 'settings' : 'nextDaySettings');
-    }
-
-    function resetToAuto(next) {
       updateSettings({
         manualDay: null,
         schedule: 'Regular Day',
