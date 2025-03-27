@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextDayText = document.getElementById('nextDayText');
     const nextDaySchedule = document.getElementById('nextDaySchedule');
 
-    // Get next school day
     const nextSchoolDate = getNextSchoolDate();
     const dayNumber = calculateDayNumber(nextSchoolDate);
     
@@ -67,6 +66,14 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(({ doc, getDoc }) => {
         return getDoc(doc(db, "nextDaySettings", "current"));
       })
+
+ function getDefaultSettings() {
+        return {
+          manualDay: null,
+          schedule: "Regular Day",
+          autoMode: true
+        };
+      }
       .then(docSnapshot => {
         const data = docSnapshot.data() || { schedule: "Regular Day" };
         nextDaySchedule.innerHTML = `
