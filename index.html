@@ -10,7 +10,36 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebase-config.js" defer></script>
+ 
+  <!-- Firebase SDK v9 (modular version) - ONLY INITIALIZATION -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    // Make available to other scripts
+    window.firebase = { 
+      db,
+      app,
+      firestore: { getFirestore } // Expose if needed
+    };
+    
+    console.log("Firebase initialized successfully");
+  </script>
+  
+  <!-- Main script (load after Firebase) -->
   <script src="script.js" defer></script>
 
 </head>
