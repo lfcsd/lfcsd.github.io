@@ -184,7 +184,7 @@
   
   <!-- Main Script -->
   <script>
- // Firebase configuration
+     // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
       authDomain: "lfcsd-days.firebaseapp.com",
@@ -194,31 +194,33 @@
       appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
     };
 
-   // Initialize Firebase
-const auth = firebase.auth();
-const db = firebase.firestore();
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-// Login functionality
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+    // Login functionality
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorElement = document.getElementById('errorMessage');
 
-  try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const token = await userCredential.user.getIdTokenResult();
-    
-    if (token.claims.admin) {
-      document.getElementById('loginContainer').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
-    } else {
-      throw new Error('Not an admin user');
-    }
-  } catch (error) {
-    alert('Login failed: ' + error.message);
-    auth.signOut();
-  }
-});
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const token = await userCredential.user.getIdTokenResult();
+        
+        if (token.claims.admin) {
+          document.getElementById('loginContainer').style.display = 'none';
+          document.getElementById('adminPanel').style.display = 'block';
+        } else {
+          throw new Error('This account is not an administrator');
+        }
+      } catch (error) {
+        errorElement.textContent = error.message;
+        await auth.signOut();
+      }
+    });
 
 // Admin functions
 async function updateSettings(updates, collection) {
