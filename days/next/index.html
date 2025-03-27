@@ -25,28 +25,30 @@
       appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // Make available to other scripts
+
     window.firebase = { 
       db,
       app,
-      firestore: { getFirestore } // Expose if needed
+      firestore: { getFirestore } 
     };
     
     console.log("Firebase initialized successfully");
   </script>
   
-  <!-- Main script (load after Firebase) -->
   <script src="script.js" defer></script>
 
 </head>
 <body>
-  <!-- Hamburger Menu -->
   <div class="menu-btn" id="menuBtn">
     <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="dropdown-menu" id="dropdownMenu">
+    <a href="/" class="menu-item">Today's Day</a>
+    <a href="/days/next/" class="menu-item">Next Day</a>
   </div>
 
   <div class="container">
@@ -54,7 +56,6 @@
       <img src="logo.png" alt="School Logo" class="logo">
     </div>
     <div class="day-container">
-      <!-- New "Viewing Next School Day" header -->
       <div class="next-day-header">
         <span class="next-day-badge">Viewing Next School Day</span>
       </div>
@@ -63,10 +64,8 @@
     </div>
   </div>
 
-  <!-- Time Display -->
   <div class="time-display" id="timeDisplay"></div>
 
-  <!-- Footer -->
   <div class="footer">
     This website is not affiliated with LFCSD
   </div>
