@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
 
-  // Login handler
+  // Login handler 
   loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     const email = document.getElementById('email').value;
