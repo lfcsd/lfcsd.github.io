@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Calculate day number (1 or 2)
   function calculateDayNumber(date) {
-    const startDate = new Date('2023-09-05'); // Your known Day 1
+    const startDate = new Date('2025-03-26'); // Your known Day 1
     const diffTime = date - startDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return (diffDays % 2) + 1; // Alternates between 1 and 2
