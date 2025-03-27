@@ -236,28 +236,56 @@ async function updateSettings(updates, collection) {
   }
 }
 
-// Today/Next day controls
-window.setDay = (day, collection) => {
-  updateSettings({
-    manualDay: day,
-    autoMode: false
-  }, collection);
-};
+function setDay(day, type) {
+      updateSettings({
+        manualDay: day,
+        autoMode: false
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
 
-window.setSchedule = (type, collection) => {
-  updateSettings({
-    schedule: type,
-    autoMode: type === 'Regular Day'
-  }, collection);
-};
+    function setSchedule(schedule, type) {
+      updateSettings({
+        schedule: schedule,
+        autoMode: schedule === 'Regular Day'
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
 
-window.resetAuto = (collection) => {
-  updateSettings({
-    manualDay: null,
-    schedule: 'Regular Day',
-    autoMode: true
-  }, collection);
-};
+    function resetToAuto(type) {
+      updateSettings({
+        manualDay: null,
+        schedule: 'Regular Day',
+        autoMode: true
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
+
+function setDay(day, next) {
+      updateSettings({
+        manualDay: day,
+        autoMode: false
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
+
+    function setSchedule(schedule, next) {
+      updateSettings({
+        schedule: schedule,
+        autoMode: schedule === 'Regular Day'
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
+
+    function resetToAuto(next) {
+      updateSettings({
+        manualDay: null,
+        schedule: 'Regular Day',
+        autoMode: true
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
+
+    function logout() {
+      auth.signOut();
+      document.getElementById('loginContainer').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+
 
 // Check if already logged in
 auth.onAuthStateChanged(async (user) => {
