@@ -6,33 +6,6 @@
   <title>LFCSD Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-  <!-- Firebase SDK v9 (modular version) - ONLY INITIALIZATION -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
-      authDomain: "lfcsd-days.firebaseapp.com",
-      projectId: "lfcsd-days",
-      storageBucket: "lfcsd-days.appspot.com",
-      messagingSenderId: "520576481150",
-      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    window.firebase = { 
-      db,
-      app,
-      firestore: { getFirestore }
-    };
-    
-    console.log("Firebase initialized successfully");
-  </script>
-
   <style>
 
 body {
@@ -138,35 +111,32 @@ body {
     </form>
   </div>
 
-  <!-- Admin Panel -->
-  <div class="admin-panel" id="adminPanel">
-    <!-- Current Day Controls -->
+ <div class="admin-panel" id="adminPanel" style="display:none;">
+    <h2>Admin Controls</h2>
+    
     <div class="admin-section">
-      <h2>Today's Day Controls</h2>
+      <h3>Today's Day Controls</h3>
       <div class="admin-buttons">
-        <button class="admin-btn" onclick="setDay(1, 'current')">Day 1</button>
-        <button class="admin-btn" onclick="setDay(2, 'current')">Day 2</button>
-        <button class="admin-btn" onclick="setSchedule('Half-Day', 'current')">Half-Day</button>
-        <button class="admin-btn" onclick="setSchedule('2hr Delay', 'current')">2 Hour Delay</button>
-        <button class="admin-btn" onclick="setSchedule('Regular Day', 'current')">Regular Day</button>
-        <button class="admin-btn" onclick="resetToAuto('current')">Reset to Auto</button>
+        <button class="admin-btn" onclick="setDay('current', 1)">Day 1</button>
+        <button class="admin-btn" onclick="setDay('current', 2)">Day 2</button>
+        <button class="admin-btn" onclick="setSchedule('current', 'Half-Day')">Half-Day</button>
+        <button class="admin-btn" onclick="setSchedule('current', '2hr Delay')">2hr Delay</button>
+        <button class="admin-btn" onclick="setSchedule('current', 'Regular Day')">Regular Day</button>
+        <button class="admin-btn" onclick="resetAuto('current')">Reset to Auto</button>
       </div>
     </div>
-
-    <!-- Next Day Controls -->
+    
     <div class="admin-section">
-      <h2>Next Day Controls</h2>
+      <h3>Next Day Controls</h3>
       <div class="admin-buttons">
-        <button class="admin-btn" onclick="setDay(1, 'next')">Day 1</button>
-        <button class="admin-btn" onclick="setDay(2, 'next')">Day 2</button>
-        <button class="admin-btn" onclick="setSchedule('Half-Day', 'next')">Half-Day</button>
-        <button class="admin-btn" onclick="setSchedule('2hr Delay', 'next')">2 Hour Delay</button>
-        <button class="admin-btn" onclick="setSchedule('Regular Day', 'next')">Regular Day</button>
-        <button class="admin-btn" onclick="resetToAuto('next')">Reset to Auto</button>
+        <button class="admin-btn" onclick="setDay('next', 1)">Day 1</button>
+        <button class="admin-btn" onclick="setDay('next', 2)">Day 2</button>
+        <button class="admin-btn" onclick="setSchedule('next', 'Half-Day')">Half-Day</button>
+        <button class="admin-btn" onclick="setSchedule('next', '2hr Delay')">2hr Delay</button>
+        <button class="admin-btn" onclick="setSchedule('next', 'Regular Day')">Regular Day</button>
+        <button class="admin-btn" onclick="resetAuto('next')">Reset to Auto</button>
       </div>
     </div>
-
-    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <!-- Firebase SDK -->
@@ -176,10 +146,29 @@ body {
   
   <!-- Main Script -->
   <script>
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
     const auth = firebase.auth();
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    window.firebase = { 
+      db,
+      app,
+      firestore: { getFirestore }
+    };
+    
+    console.log("Firebase initialized successfully");
 
     // Login functionality
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
