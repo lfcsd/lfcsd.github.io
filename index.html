@@ -9,30 +9,9 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon.png">
   
-  <!-- Firebase SDK v9 (modern modular version) -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+ <script src="firebase-config.js" defer></script>
+ <script src="script.js" defer></script>
 
-    const firebaseConfig = {
-    apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
-    authDomain: "lfcsd-days.firebaseapp.com",
-    projectId: "lfcsd-days",
-    storageBucket: "lfcsd-days.firebasestorage.app",
-    messagingSenderId: "520576481150",
-    appId: "1:520576481150:web:b08a50be7b0d15e113e52f",
-    measurementId: "G-7NPR8M9T6C"
-  };
-
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    // Make available to other scripts
-    window.firebaseApp = app;
-    window.db = db;
-  </script>
 </head>
 <body>
   <!-- Hamburger Menu -->
@@ -61,72 +40,5 @@
 <div class="footer">
   This website is not affiliated with LFCSD
 </div>
-
-  <!-- Main Script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Hamburger menu functionality
-      const menuBtn = document.getElementById('menuBtn');
-      const dropdownMenu = document.getElementById('dropdownMenu');
-      
-      menuBtn.addEventListener('click', function() {
-        dropdownMenu.classList.toggle('show');
-      });
-      
-      // Close menu when clicking outside
-      document.addEventListener('click', function(event) {
-        if (!menuBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
-          dropdownMenu.classList.remove('show');
-        }
-      });
-
-      // Initialize Firestore listener
-      if (window.db) {
-        import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
-          .then(({ onSnapshot, doc }) => {
-            const unsub = onSnapshot(doc(db, "settings", "current"), (doc) => {
-              const data = doc.data();
-              updateDisplay(data);
-            });
-            
-            function updateDisplay(data) {
-              const today = new Date();
-              const dayOfWeek = today.getDay();
-              const dayTextElement = document.getElementById('dayText');
-              const specialScheduleElement = document.getElementById('specialSchedule');
-              
-              // Weekend check
-              if (dayOfWeek === 0 || dayOfWeek === 6) {
-                dayTextElement.textContent = 'No School';
-                specialScheduleElement.innerHTML = '';
-                return;
-              }
-              
-              // Day calculation
-              if (data && !data.autoMode && data.manualDay !== null) {
-                dayTextElement.textContent = `Day ${data.manualDay}`;
-              } else {
-                const startDate = new Date('2023-09-05');
-                const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-                dayTextElement.textContent = `Day ${(diffDays % 2) + 1}`;
-              }
-              
-              // Schedule display
-              if (data && data.schedule && data.schedule !== 'Regular Day') {
-                specialScheduleElement.innerHTML = `<span class="schedule-badge">${data.schedule}</span>`;
-              } else {
-                specialScheduleElement.innerHTML = '';
-              }
-            }
-          })
-          .catch(error => {
-            console.error("Firestore load error:", error);
-            document.getElementById('dayText').textContent = "System Error";
-          });
-      } else {
-        console.error("Firebase not initialized");
-      }
-    });
-  </script>
 </body>
 </html>
