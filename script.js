@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize Firestore
+  // Initialize Firebase
   const db = firebase.firestore();
   
   // Hamburger menu functionality
@@ -17,13 +17,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Real-time listener for day updates
-  db.collection("settings").doc("current")
-    .onSnapshot((doc) => {
-      const data = doc.data();
-      updateDisplay(data);
-    });
-  
+  // Real-time Firestore listener
+  db.collection("settings").doc("current").onSnapshot((doc) => {
+    const data = doc.data() || {
+      manualDay: null,
+      schedule: "Regular Day",
+      autoMode: true
+    };
+    
+    updateDisplay(data);
+  });
+
   function updateDisplay(data) {
     const today = new Date();
     const dayOfWeek = today.getDay();
@@ -38,19 +42,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Day calculation
-    if (data && !data.autoMode && data.manualDay !== null) {
-      dayTextElement.textContent = `Day ${data.manualDay}`;
-    } else {
-      const startDate = new Date('2025-03-26'); // Adjust to your known Day 1
+    if (data.autoMode !== false && (data.manualDay === null || data.manualDay === undefined)) {
+      // Automatic day rotation
+      const startDate = new Date('2023-09-05'); // Your known Day 1 date
       const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
       dayTextElement.textContent = `Day ${(diffDays % 2) + 1}`;
+    } else {
+      // Manual day override
+      dayTextElement.textContent = `Day ${data.manualDay}`;
     }
     
-    // Schedule display
-    if (data && data.schedule && data.schedule !== 'Regular Day') {
+    // Schedule display - FIXED TO ALWAYS SHOW REGULAR DAY WHEN APPLICABLE
+    if (data.schedule && data.schedule !== 'Regular Day') {
       specialScheduleElement.innerHTML = `<span class="schedule-badge">${data.schedule}</span>`;
     } else {
-      specialScheduleElement.innerHTML = '';
+      specialScheduleElement.innerHTML = '<span class="schedule-badge">Regular Day</span>';
     }
   }
+
+  // Error handling for Firebase
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user) return;
+    
+    user.getIdTokenResult()
+      .then(token => {
+        if (token.claims.admin) {
+          console.log("Admin user detected");
+        }
+      })
+      .catch(error => console.error("Token error:", error));
+  });
 });
