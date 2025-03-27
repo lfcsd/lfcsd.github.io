@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LFCSD Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script type="module" src="firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    .login-container {
+      background: rgba(0,0,0,0.7);
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 2rem auto;
+      color: white;
+    }
+    .admin-panel {
+      display: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="login-container" id="loginContainer">
+  <h2>Admin Login</h2>
+  <form id="loginForm">
+    <div class="form-group">
+      <label>Email: <input type="email" id="email" required></label>
+    </div>
+    <div class="form-group">
+      <label>Password: <input type="password" id="password" required></label>
+    </div>
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+  <div class="admin-panel" id="adminPanel">
+    <h2>Admin Controls</h2>
+    <div class="admin-buttons">
+      <button onclick="setDay(1)">Day 1</button>
+      <button onclick="setDay(2)">Day 2</button>
+      <button onclick="setSchedule('Half-Day')">Half-Day</button>
+      <button onclick="setSchedule('2hr Delay')">2hr Delay</button>
+      <button onclick="setSchedule('Regular Day')">Regular Day</button>
+      <button onclick="resetAuto()">Reset to Auto</button>
+    </div>
+  </div>
+  <script src="admin.js"></script>
+</body>
+</html>
