@@ -47,17 +47,16 @@ body {
 }
 
 .special-schedule {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    text-align: center;
+  display: block;
+  margin-bottom: 10px;
 }
 
 .schedule-badge {
-    background: rgba(128, 128, 128, 0.65);
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-size: 1.2rem;
-    font-weight: 400;
+  background: rgba(128, 128, 128, 0.65);
+  padding: 2px 12px;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  display: inline-block;
 }
 
 /* Menu Button Styles */
