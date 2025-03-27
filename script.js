@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Day calculation logic
         if (data.autoMode !== false && !data.manualDay) {
           // Automatic day rotation
-          const startDate = new Date('2025-03-25'); // Your known Day 1
+          const startDate = new Date('2025-03-26'); // Your known Day 1
           const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
           dayTextElement.textContent = `Day ${(diffDays % 2) + 1}`;
         } else {
