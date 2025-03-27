@@ -5,40 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LFCSD Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script type="module" src="firebase-config.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="admin.js" defer></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    .login-container, .admin-panel {
+    /* Base Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Lexend', sans-serif;
+      background: linear-gradient(135deg, #6a0dad, #8a2be2);
+      color: white;
+      min-height: 100vh;
+    }
+
+    /* Login Container */
+    .login-container {
       background: rgba(0, 0, 0, 0.7);
       padding: 30px;
       border-radius: 10px;
-      max-width: 800px;
-      margin: 20px auto;
+      max-width: 400px;
+      margin: 50px auto;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-family: 'Lexend', sans-serif;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 10px;
+      background: #8a2be2;
       color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Lexend', sans-serif;
+      transition: background 0.3s;
     }
+
+    .login-btn:hover {
+      background: #6a0dad;
+    }
+
+    .error {
+      color: #ff6b6b;
+      margin-bottom: 15px;
+    }
+
+    /* Admin Panel */
+    .admin-panel {
+      display: none;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
     .admin-section {
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #444;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
-    .admin-section h3 {
+
+    .admin-section h2 {
       margin-top: 0;
-      color: #8a2be2;
+      border-bottom: 1px solid #8a2be2;
+      padding-bottom: 10px;
     }
+
     .admin-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
-      margin-top: 15px;
     }
+
     .admin-btn {
       padding: 10px 15px;
       background: #8a2be2;
@@ -49,62 +104,77 @@
       font-family: 'Lexend', sans-serif;
       transition: background 0.3s;
     }
+
     .admin-btn:hover {
       background: #6a0dad;
     }
-    .next-day-btn {
-      background: #4b0082; /* Different color for next day controls */
+
+    .logout-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
-    .next-day-btn:hover {
-      background: #3a006d;
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .admin-buttons {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Login Form -->
   <div class="login-container" id="loginContainer">
     <h2>Admin Login</h2>
+    <div class="error" id="errorMessage"></div>
     <form id="loginForm">
       <div class="form-group">
-        <label>Email: <input type="email" id="email" required></label>
+        <label>Email:</label>
+        <input type="email" id="email" required>
       </div>
       <div class="form-group">
-        <label>Password: <input type="password" id="password" required></label>
+        <label>Password:</label>
+        <input type="password" id="password" required>
       </div>
-      <button type="submit" class="admin-btn">Login</button>
+      <button type="submit" class="login-btn">Login</button>
     </form>
   </div>
 
-  <div class="admin-panel" id="adminPanel" style="display:none;">
-    <h2>Admin Controls</h2>
-    
+  <!-- Admin Panel -->
+  <div class="admin-panel" id="adminPanel">
     <!-- Current Day Controls -->
     <div class="admin-section">
-      <h3>Today's Day Controls</h3>
+      <h2>Today's Day Controls</h2>
       <div class="admin-buttons">
-        <button class="admin-btn" onclick="setDay(1)">Day 1</button>
-        <button class="admin-btn" onclick="setDay(2)">Day 2</button>
-        <button class="admin-btn" onclick="setSchedule('Half-Day')">Half-Day</button>
-        <button class="admin-btn" onclick="setSchedule('2hr Delay')">2 Hour Delay</button>
-        <button class="admin-btn" onclick="setSchedule('Regular Day')">Regular Day</button>
-        <button class="admin-btn" onclick="resetToAuto()">Reset to Auto</button>
+        <button class="admin-btn" onclick="setDay(1, 'current')">Day 1</button>
+        <button class="admin-btn" onclick="setDay(2, 'current')">Day 2</button>
+        <button class="admin-btn" onclick="setSchedule('Half-Day', 'current')">Half-Day</button>
+        <button class="admin-btn" onclick="setSchedule('2hr Delay', 'current')">2 Hour Delay</button>
+        <button class="admin-btn" onclick="setSchedule('Regular Day', 'current')">Regular Day</button>
+        <button class="admin-btn" onclick="resetToAuto('current')">Reset to Auto</button>
       </div>
     </div>
-    
-   <div class="admin-section" id="nextDayControls" style="display:none;">
-  <h3>Next Day Controls</h3>
-  <div class="admin-buttons">
-    <button class="admin-btn" onclick="setNextDay(1)">Next Day 1</button>
-    <button class="admin-btn" onclick="setNextDay(2)">Next Day 2</button>
-    <button class="admin-btn" onclick="setNextSchedule('Half-Day')">Next Half-Day</button>
-    <button class="admin-btn" onclick="setNextSchedule('2hr Delay')">Next 2hr Delay</button>
-    <button class="admin-btn" onclick="setNextSchedule('Regular Day')">Next Regular Day</button>
-    <button class="admin-btn" onclick="resetToAuto()">Reset Next Day Auto</button>
-  </div>
-</div>
-    
-    <div class="logout-btn">
-      <a href="#" onclick="logout()">Logout</a>
+
+    <!-- Next Day Controls -->
+    <div class="admin-section">
+      <h2>Next Day Controls</h2>
+      <div class="admin-buttons">
+        <button class="admin-btn" onclick="setDay(1, 'next')">Day 1</button>
+        <button class="admin-btn" onclick="setDay(2, 'next')">Day 2</button>
+        <button class="admin-btn" onclick="setSchedule('Half-Day', 'next')">Half-Day</button>
+        <button class="admin-btn" onclick="setSchedule('2hr Delay', 'next')">2 Hour Delay</button>
+        <button class="admin-btn" onclick="setSchedule('Regular Day', 'next')">Regular Day</button>
+        <button class="admin-btn" onclick="resetToAuto('next')">Reset to Auto</button>
+      </div>
     </div>
+
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <!-- Firebase SDK -->
@@ -112,8 +182,101 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   
-  <!-- Config and main script -->
-  <script src="firebase-config.js"></script>
-  <script src="admin.js"></script>
+  <!-- Main Script -->
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Login functionality
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorElement = document.getElementById('errorMessage');
+
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const token = await userCredential.user.getIdTokenResult();
+        
+        if (token.claims.admin) {
+          document.getElementById('loginContainer').style.display = 'none';
+          document.getElementById('adminPanel').style.display = 'block';
+        } else {
+          throw new Error('This account is not an administrator');
+        }
+      } catch (error) {
+        errorElement.textContent = error.message;
+        await auth.signOut();
+      }
+    });
+
+    // Admin functions
+    async function updateSettings(updates, collection) {
+      try {
+        await db.collection(collection).doc("current").update({
+          ...updates,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Settings updated successfully!');
+      } catch (error) {
+        alert('Error updating settings: ' + error.message);
+      }
+    }
+
+    function setDay(day, type) {
+      updateSettings({
+        manualDay: day,
+        autoMode: false
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
+
+    function setSchedule(schedule, type) {
+      updateSettings({
+        schedule: schedule,
+        autoMode: schedule === 'Regular Day'
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
+
+    function resetToAuto(type) {
+      updateSettings({
+        manualDay: null,
+        schedule: 'Regular Day',
+        autoMode: true
+      }, type === 'current' ? 'settings' : 'nextDaySettings');
+    }
+
+    function logout() {
+      auth.signOut();
+      document.getElementById('loginContainer').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+    }
+
+    // Check if already logged in
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const token = await user.getIdTokenResult();
+          if (token.claims.admin) {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+          }
+        } catch (error) {
+          console.error("Auth check error:", error);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
