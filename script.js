@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const db = firebase.firestore();
   
-  // Menu toggle functionality
+  // Menu toggle functionality (keep your existing code)
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
   
@@ -15,13 +15,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Firestore listener
+  // Firestore listener with FORCED display
   db.collection("settings").doc("current").onSnapshot((doc) => {
     const data = doc.data() || {
       manualDay: null,
-      schedule: "Regular Day",
+      schedule: "Regular Day", // Default value
       autoMode: true
     };
+    
+    // DEBUG: Log the received data
+    console.log("Firestore data:", data);
     
     updateDisplay(data);
   });
@@ -32,24 +35,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const dayTextElement = document.getElementById('dayText');
     const specialScheduleElement = document.getElementById('specialSchedule');
 
-    // Clear previous content
-    dayTextElement.textContent = '';
-    specialScheduleElement.innerHTML = '';
+    // DEBUG: Log current display state
+    console.log("Updating display with:", data);
 
     // Weekend check
     if (dayOfWeek === 0 || dayOfWeek === 6) {
       dayTextElement.textContent = 'No School';
+      specialScheduleElement.innerHTML = '';
       return;
     }
 
-    // Always show schedule badge - MODIFIED TO APPEAR ABOVE DAY TEXT
-    const scheduleBadge = document.createElement('div');
-    scheduleBadge.className = 'schedule-badge';
-    scheduleBadge.textContent = data.schedule || 'Regular Day';
-    specialScheduleElement.appendChild(scheduleBadge);
+    // ALWAYS create schedule badge - no conditions
+    specialScheduleElement.innerHTML = `
+      <span class="schedule-badge">
+        ${data.schedule || 'Regular Day'}
+      </span>
+    `;
 
     // Day calculation
-    if (data.autoMode && (data.manualDay === null || data.manualDay === undefined)) {
+    if (data.autoMode !== false && !data.manualDay) {
       const startDate = new Date('2025-03-26');
       const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
       dayTextElement.textContent = `Day ${(diffDays % 2) + 1}`;
