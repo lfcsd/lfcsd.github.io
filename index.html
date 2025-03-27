@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LFCSD Days</title>
+  <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon.png">
-  
- <script src="firebase-config.js" defer></script>
- <script src="script.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebase-config.js" defer></script>
+  <script src="script.js" defer></script>
 
 </head>
 <body>
@@ -25,10 +26,9 @@
     <a href="/tomorrow" class="menu-item">Next Day</a>
   </div>
 
-  <!-- Main Content -->
-  <div class="container">
+ <div class="container">
     <div class="logo-container">
-      <img src="logo.png" alt="School Logo" class="logo">
+      <img src="logo.png" alt="School Logo" class="logo" id="logo">
     </div>
     <div class="day-container">
       <div class="special-schedule" id="specialSchedule"></div>
@@ -36,9 +36,10 @@
     </div>
   </div>
 
- <div class="time-display" id="timeDisplay"></div>
-<div class="footer">
-  This website is not affiliated with LFCSD
-</div>
+  <div class="time-display" id="timeDisplay"></div>
+
+  <div class="footer">
+    This website is not affiliated with LFCSD
+  </div>
 </body>
 </html>
