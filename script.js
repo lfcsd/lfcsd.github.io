@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
   const db = firebase.firestore();
-  
+  updateTime();
+
+  updateTime();
+  setInterval(updateTime, 60000);
   // Menu toggle functionality (keep your existing code)
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
@@ -61,4 +64,20 @@ document.addEventListener('DOMContentLoaded', function() {
       dayTextElement.textContent = `Day ${data.manualDay}`;
     }
   }
+});
+
+// Time display function (add this near your other DOMContentLoaded code)
+function updateTime() {
+  const options = {
+    timeZone: 'America/New_York',
+    weekday: 'long',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  };
+  
+  const now = new Date();
+  const timeString = now.toLocaleString('en-US', options);
+  document.getElementById('timeDisplay').textContent = timeString;
+}
 });
