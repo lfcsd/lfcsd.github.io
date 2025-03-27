@@ -85,3 +85,34 @@ async function resetAuto(type) {
     alert(`Error resetting ${type}: ` + error.message);
   }
 }
+
+async function setAnnouncement() {
+  const message = document.getElementById('announcementText').value.trim();
+  const color = document.getElementById('announcementColor').value.trim();
+  
+  if (!message) {
+    alert('Please enter an announcement message');
+    return;
+  }
+
+  try {
+    await db.collection("announcements").doc("current").set({
+      message: message,
+      color: color || '#6a0dad', // Default purple if empty
+      lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert('Announcement set successfully!');
+  } catch (error) {
+    alert('Error setting announcement: ' + error.message);
+  }
+}
+
+async function clearAnnouncement() {
+  try {
+    await db.collection("announcements").doc("current").delete();
+    document.getElementById('announcementText').value = '';
+    alert('Announcement cleared successfully!');
+  } catch (error) {
+    alert('Error clearing announcement: ' + error.message);
+  }
+}
