@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get schedule from Firestore
     import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
       .then(({ doc, getDoc }) => {
-        return getDoc(doc(db, "settings", "current"));
+        return getDoc(doc(db, "nextDaySettings", "current"));
       })
       .then(docSnapshot => {
         const data = docSnapshot.data() || { schedule: "Regular Day" };
