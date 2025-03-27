@@ -28,15 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
   updateTime();
   setInterval(updateTime, 60000);
 
-  // Main logic
-  if (window.firebase?.db) {
+   if (window.firebase?.db) {
     const { db } = window.firebase;
     const nextDayText = document.getElementById('nextDayText');
     const nextDaySchedule = document.getElementById('nextDaySchedule');
 
     function getDefaultSettings() {
       return {
-        manualDay: null,
+        manualDay: null,  // Explicit null instead of undefined
         schedule: "Regular Day",
         autoMode: true
       };
@@ -63,42 +62,54 @@ document.addEventListener('DOMContentLoaded', function() {
       return (diffDays % 2) + 1; // Alternates between 1 and 2
     }
 
-    // Firestore listener for next day settings
     import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
       .then(({ onSnapshot, doc }) => {
-        // Real-time updates for next day
-        const unsubscribe = onSnapshot(doc(db, "nextDaySettings", "current"), (docSnapshot) => {
-          const data = docSnapshot.data() || getDefaultSettings();
-          updateNextDayDisplay(data);
-        });
+        const unsubscribe = onSnapshot(doc(db, "nextDaySettings", "current"), 
+          (docSnapshot) => {
+            let data = getDefaultSettings();
+            if (docSnapshot.exists()) {
+              const docData = docSnapshot.data();
+              // Ensure manualDay is either null, 1, or 2
+              data.manualDay = (docData.manualDay === 1 || docData.manualDay === 2) ? docData.manualDay : null;
+              data.schedule = docData.schedule || "Regular Day";
+              data.autoMode = docData.autoMode !== false; // Default to true if not set
+            }
+            updateNextDayDisplay(data);
+          },
+          (error) => {
+            console.error("Firestore error:", error);
+            updateNextDayDisplay(getDefaultSettings());
+          }
+        );
 
         function updateNextDayDisplay(data) {
           const nextSchoolDate = getNextSchoolDate();
           
-          // Clear previous state
           nextDayText.textContent = '';
           nextDaySchedule.innerHTML = '';
 
-          // Always show schedule badge (including "Regular Day")
+          // Schedule badge
           const badge = document.createElement('span');
           badge.className = 'schedule-badge';
-          badge.textContent = data.schedule || 'Regular Day';
+          badge.textContent = data.schedule;
           nextDaySchedule.appendChild(badge);
 
-          // Day calculation logic
-          if (data.autoMode !== false && !data.manualDay) {
-            // Automatic day rotation
+          // Day calculation
+          if (data.autoMode && data.manualDay === null) {
+            // Automatic mode
             const dayNumber = calculateDayNumber(nextSchoolDate);
             nextDayText.textContent = `Day ${dayNumber}`;
           } else {
-            // Manual override
-            nextDayText.textContent = `Day ${data.manualDay}`;
+            // Manual override (only if manualDay is 1 or 2)
+            nextDayText.textContent = data.manualDay ? `Day ${data.manualDay}` : 'Calculating...';
           }
         }
       })
       .catch(error => {
         console.error("Failed to load Firestore:", error);
-        nextDayText.textContent = "Connection Error";
+        const dayNumber = calculateDayNumber(getNextSchoolDate());
+        nextDayText.textContent = `Day ${dayNumber}`;
+        nextDaySchedule.innerHTML = '<span class="schedule-badge">Regular Day</span>';
       });
   }
 });
