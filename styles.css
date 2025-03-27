@@ -46,17 +46,19 @@ body {
     text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
 }
 
-.special-schedule {
-  display: block;
+#specialSchedule {
+  display: block !important;
+  min-height: 24px;
   margin-bottom: 10px;
 }
 
 .schedule-badge {
   background: rgba(128, 128, 128, 0.65);
-  padding: 2px 12px;
+  padding: 4px 12px;
   border-radius: 20px;
   font-size: 1.2rem;
   display: inline-block;
+  color: white;
 }
 
 /* Menu Button Styles */
