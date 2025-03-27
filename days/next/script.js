@@ -28,14 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
   updateTime();
   setInterval(updateTime, 60000);
 
-   if (window.firebase?.db) {
+  if (window.firebase?.db) {
     const { db } = window.firebase;
     const nextDayText = document.getElementById('nextDayText');
     const nextDaySchedule = document.getElementById('nextDaySchedule');
 
     function getDefaultSettings() {
       return {
-        manualDay: null,  // Explicit null instead of undefined
+        manualDay: null,
         schedule: "Regular Day",
         autoMode: true
       };
@@ -62,17 +62,20 @@ document.addEventListener('DOMContentLoaded', function() {
       return (diffDays % 2) + 1; // Alternates between 1 and 2
     }
 
-    import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
+   import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
       .then(({ onSnapshot, doc }) => {
         const unsubscribe = onSnapshot(doc(db, "nextDaySettings", "current"), 
           (docSnapshot) => {
             let data = getDefaultSettings();
             if (docSnapshot.exists()) {
               const docData = docSnapshot.data();
-              // Ensure manualDay is either null, 1, or 2
-              data.manualDay = (docData.manualDay === 1 || docData.manualDay === 2) ? docData.manualDay : null;
-              data.schedule = docData.schedule || "Regular Day";
-              data.autoMode = docData.autoMode !== false; // Default to true if not set
+              // Merge with defaults
+              data = {
+                ...data,
+                ...docData,
+                // Ensure manualDay is valid
+                manualDay: (docData.manualDay === 1 || docData.manualDay === 2) ? docData.manualDay : null
+              };
             }
             updateNextDayDisplay(data);
           },
@@ -83,25 +86,27 @@ document.addEventListener('DOMContentLoaded', function() {
         );
 
         function updateNextDayDisplay(data) {
-          const nextSchoolDate = getNextSchoolDate();
-          
           nextDayText.textContent = '';
           nextDaySchedule.innerHTML = '';
 
           // Schedule badge
           const badge = document.createElement('span');
           badge.className = 'schedule-badge';
-          badge.textContent = data.schedule;
+          badge.textContent = data.schedule || 'Regular Day';
           nextDaySchedule.appendChild(badge);
 
-          // Day calculation
+          // Day display logic - matches main page behavior exactly
           if (data.autoMode && data.manualDay === null) {
-            // Automatic mode
-            const dayNumber = calculateDayNumber(nextSchoolDate);
+            // Automatic mode - calculate next day
+            const dayNumber = calculateDayNumber(getNextSchoolDate());
             nextDayText.textContent = `Day ${dayNumber}`;
+          } else if (data.manualDay === 1 || data.manualDay === 2) {
+            // Manual override - show the set day
+            nextDayText.textContent = `Day ${data.manualDay}`;
           } else {
-            // Manual override (only if manualDay is 1 or 2)
-            nextDayText.textContent = data.manualDay ? `Day ${data.manualDay}` : 'Calculating...';
+            // Invalid state - fallback to calculation
+            const dayNumber = calculateDayNumber(getNextSchoolDate());
+            nextDayText.textContent = `Day ${dayNumber}`;
           }
         }
       })
