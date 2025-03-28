@@ -48,7 +48,25 @@ document.addEventListener('DOMContentLoaded', function() {
   const announcementBar = document.getElementById('announcementBar');
 
   // ======================
-  // 4. FIRESTORE LISTENERS
+  // 4. DAY CALCULATION LOGIC (UPDATED FOR MIDNIGHT EST)
+  // ======================
+  const START_DATE = new Date('2025-03-26T00:00:00-05:00'); // Known Day 1 in EST
+
+  function getCurrentESTDate() {
+    const now = new Date();
+    const estTime = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+    return new Date(estTime);
+  }
+
+  function calculateCurrentDay() {
+    const estNow = getCurrentESTDate();
+    const diffTime = estNow - START_DATE;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return (diffDays % 2) + 1; // Returns 1 or 2
+  }
+
+  // ======================
+  // 5. FIRESTORE LISTENERS
   // ======================
   import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
     .then(({ onSnapshot, doc }) => {
@@ -59,12 +77,17 @@ document.addEventListener('DOMContentLoaded', function() {
           announcementBar.textContent = data.message;
           announcementBar.style.backgroundColor = data.color || '#6a0dad';
           announcementBar.style.display = 'block';
+          
+          // Add class to body when announcement exists
+          document.body.classList.add('has-announcement');
         } else {
           announcementBar.style.display = 'none';
+          document.body.classList.remove('has-announcement');
         }
       }, (error) => {
         console.error("Announcement error:", error);
         announcementBar.style.display = 'none';
+        document.body.classList.remove('has-announcement');
       });
 
       // Real-time updates for day/schedule
@@ -97,18 +120,16 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
 
-        // Always show schedule badge (including "Regular Day")
+        // Always show schedule badge
         const badge = document.createElement('span');
         badge.className = 'schedule-badge';
         badge.textContent = data.schedule || 'Regular Day';
         specialScheduleElement.appendChild(badge);
 
-        // Day calculation logic
+        // Day calculation logic - UPDATED FOR MIDNIGHT EST SWITCH
         if (data.autoMode !== false && !data.manualDay) {
-          // Automatic day rotation
-          const startDate = new Date('2025-03-26'); // Your known Day 1
-          const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-          dayTextElement.textContent = `Day ${(diffDays % 2) + 1}`;
+          // Automatic day rotation (now switches at midnight EST)
+          dayTextElement.textContent = `Day ${calculateCurrentDay()}`;
         } else {
           // Manual override
           dayTextElement.textContent = `Day ${data.manualDay}`;
