@@ -98,24 +98,26 @@ document.addEventListener('DOMContentLoaded', function() {
       const announcementBar = document.getElementById('announcementBar');
       const container = document.querySelector('.container');
 
-      // ANNOUNCEMENT LISTENER (FIXED)
       onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
-        if (docSnapshot.exists() && docSnapshot.data().message) {
-          const data = docSnapshot.data();
-          announcementBar.textContent = data.message;
-          announcementBar.style.backgroundColor = data.color || '#6a0dad';
-          announcementBar.style.display = 'block';
-          container.style.marginTop = '60px';
-        } else {
-          announcementBar.style.display = 'none';
-          container.style.marginTop = '0';
-        }
-      }, (error) => {
-        console.error("Announcement error:", error);
-        announcementBar.style.display = 'none';
-        container.style.marginTop = '0';
-      });
-
+  const announcementBar = document.getElementById('announcementBar');
+  
+  if (docSnapshot.exists() && docSnapshot.data().message) {
+    const data = docSnapshot.data();
+    announcementBar.textContent = data.message;
+    announcementBar.style.backgroundColor = data.color || '#6a0dad';
+    announcementBar.style.display = 'block';
+    
+    // Add class to body when announcement exists
+    document.body.classList.add('has-announcement');
+  } else {
+    announcementBar.style.display = 'none';
+    document.body.classList.remove('has-announcement');
+  }
+}, (error) => {
+  console.error("Announcement error:", error);
+  document.getElementById('announcementBar').style.display = 'none';
+  document.body.classList.remove('has-announcement');
+});
       // DAY/SCHEDULE LISTENER
       onSnapshot(doc(db, "settings", "current"), (docSnapshot) => {
         const data = docSnapshot.data() || {
