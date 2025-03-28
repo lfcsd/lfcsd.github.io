@@ -230,32 +230,35 @@ body {
 }
 
 .announcement-bar {
-  width: 100%;
-  padding: 12px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  padding: 12px 0;
   background-color: #6a0dad;
   color: white;
   text-align: center;
   font-family: 'Lexend', sans-serif;
   font-size: 1rem;
-  display: none; /* Hidden by default */
-  position: relative;
   z-index: 1000;
   box-sizing: border-box;
+  margin: 0;
+  border: none;
+  display: none; /* Hidden by default */
 }
 
-@media (max-width: 768px) {
-  .announcement-bar {
-    padding: 10px 15px;
-    font-size: 0.9rem;
-  }
-}
-
-body.has-announcement .container {
+.container {
   margin-top: 60px;
 }
 
 @media (max-width: 768px) {
-  body.has-announcement .container {
+  .announcement-bar {
+    padding: 10px 0;
+    font-size: 0.9rem;
+  }
+  
+  .container {
     margin-top: 50px;
   }
 }
