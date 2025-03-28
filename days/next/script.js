@@ -141,6 +141,38 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
       })
+
+  onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
+  const announcementBar = document.getElementById('announcementBar');
+  const container = document.querySelector('.container');
+  
+  if (docSnapshot.exists() && docSnapshot.data().message) {
+    const data = docSnapshot.data();
+    announcementBar.textContent = data.message;
+    announcementBar.style.backgroundColor = data.color || '#6a0dad';
+    announcementBar.style.display = 'block';
+    container.style.marginTop = '60px';
+  } else {
+    announcementBar.style.display = 'none';
+    container.style.marginTop = '0';
+  }
+}, (error) => {
+  console.error("Announcement error:", error);
+  document.getElementById('announcementBar').style.display = 'none';
+  document.querySelector('.container').style.marginTop = '0';
+});
+
+// Update the report button to specify "Next Day" in the Discord message
+reportBtn.addEventListener('click', function() {
+  if (confirm('Are you sure you want to report the NEXT day as incorrect?')) {
+    const message = {
+      content: 'Hey <@957691566271660102>! A user reported the NEXT day may be incorrect!',
+      embeds: [{
+        title: 'Next Day Report',
+        description: `Reported at: ${new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})} EST`,
+        color: 0xff0000
+      }]
+    };
       .catch(error => {
         console.error("Failed to load Firestore:", error);
         // Fallback display
