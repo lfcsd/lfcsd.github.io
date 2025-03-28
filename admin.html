@@ -258,10 +258,10 @@
     </div>
     
     <div class="admin-buttons">
-      <button class="admin-btn apply-btn" onclick="setAnnouncement()">
+      <button class="admin-btn apply-btn" id="applyAnnouncementBtn">
         <i class="fas fa-bullhorn"></i> Apply Announcement
       </button>
-      <button class="admin-btn clear-btn" onclick="clearAnnouncement()">
+      <button class="admin-btn clear-btn" id="clearAnnouncement">
         <i class="fas fa-times"></i> Clear Announcement
       </button>
     </div>
@@ -376,6 +376,11 @@
         }
       }
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Button event listeners
+    document.getElementById('applyAnnouncementBtn').addEventListener('click', setAnnouncement);
+    document.getElementById('clearAnnouncementBtn').addEventListener('click', clearAnnouncement);
 
   // Announcement Functions
 async function setAnnouncement() {
