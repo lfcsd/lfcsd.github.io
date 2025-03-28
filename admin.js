@@ -88,31 +88,50 @@ async function resetAuto(type) {
 
 async function setAnnouncement() {
   const message = document.getElementById('announcementText').value.trim();
-  const color = document.getElementById('announcementColor').value.trim();
+  const color = document.getElementById('announcementColor').value.trim() || '#6a0dad';
   
   if (!message) {
     alert('Please enter an announcement message');
     return;
   }
 
+  // Validate hex color
+  if (!/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
+    alert('Please enter a valid hex color (e.g., #6a0dad)');
+    return;
+  }
+
   try {
-    await db.collection("announcements").doc("current").set({
+    await firebase.firestore().collection("announcements").doc("current").set({
       message: message,
-      color: color || '#6a0dad', // Default purple if empty
+      color: color,
       lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
     });
-    alert('Announcement set successfully!');
+    alert('Announcement set successfully!\nIt will appear immediately on all devices.');
   } catch (error) {
-    alert('Error setting announcement: ' + error.message);
+    console.error("Error:", error);
+    alert('Error: ' + error.message);
   }
 }
 
 async function clearAnnouncement() {
   try {
-    await db.collection("announcements").doc("current").delete();
+    await firebase.firestore().collection("announcements").doc("current").delete();
     document.getElementById('announcementText').value = '';
-    alert('Announcement cleared successfully!');
+    document.getElementById('announcementColor').value = '#6a0dad';
+    alert('Announcement cleared successfully!\nIt will disappear immediately from all devices.');
   } catch (error) {
-    alert('Error clearing announcement: ' + error.message);
+    console.error("Error:", error);
+    alert('Error: ' + error.message);
   }
 }
+
+// Add this to your existing auth check to pre-load current announcement
+auth.onAuthStateChanged(async (user) => {
+  if (user && (await user.getIdTokenResult()).claims.admin) {
+    // Load current announcement if exists
+    const doc = await firebase.firestore().collection("announcements").doc("current").get();
+    if (doc.exists) {
+      document.getElementById('announcementText').value = doc.data().message || '';
+      document.getElementById('announcementColor').value = doc.data().color || '#6a0dad';
+    }
