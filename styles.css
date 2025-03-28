@@ -250,7 +250,6 @@ body {
   }
 }
 
-/* Adjust container position when announcement is visible */
 body.has-announcement .container {
   margin-top: 60px;
 }
@@ -259,4 +258,37 @@ body.has-announcement .container {
   body.has-announcement .container {
     margin-top: 50px;
   }
+}
+
+.report-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(128, 128, 128, 0.65);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: background 0.3s;
+}
+
+.report-btn:hover {
+  background: rgba(128, 128, 128, 0.85);
+}
+
+.exclamation-mark {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: 'Lexend', sans-serif;
+  transform: translateY(-1px);
+}
+
+.dropdown-menu {
+  right: 20px;
+  left: auto;
 }
