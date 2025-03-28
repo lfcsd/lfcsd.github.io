@@ -228,3 +228,35 @@ body {
   font-size: 1.2rem;
   display: inline-block;
 }
+
+.announcement-bar {
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #6a0dad;
+  color: white;
+  text-align: center;
+  font-family: 'Lexend', sans-serif;
+  font-size: 1rem;
+  display: none; /* Hidden by default */
+  position: relative;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .announcement-bar {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Adjust container position when announcement is visible */
+body.has-announcement .container {
+  margin-top: 60px;
+}
+
+@media (max-width: 768px) {
+  body.has-announcement .container {
+    margin-top: 50px;
+  }
+}
