@@ -152,3 +152,50 @@ document.addEventListener('DOMContentLoaded', function() {
     nextDayText.textContent = "System Error";
   }
 });
+
+// ======================
+// REPORT BUTTON FUNCTIONALITY
+// ======================
+const reportBtn = document.getElementById('reportBtn');
+
+reportBtn.addEventListener('click', function() {
+  // Show confirmation dialog
+  if (confirm('Are you sure you want to report this next day as incorrect?\nThis will notify the site administrator.')) {
+    sendDiscordAlert();
+  }
+});
+
+function sendDiscordAlert() {
+  const webhookURL = 'https://discord.com/api/webhooks/1354971848944779284/IfbRlUhpkTNh02jb5nH3oRE_Epdv-lNwJ2mJFntGiDXZKD-fqaVy7kDd2WTMbaXTJNIk';
+  const message = {
+    content: 'Hey <@957691566271660102>! A user of LFCSD Days has reported the next day may be incorrect! Please take a look into this as soon as you can!',
+    embeds: [{
+      title: 'Day Report',
+      description: `Page: ${window.location.pathname.includes('next') ? 'Next Day' : 'Current Day'}\n` +
+                   `Reported at: ${new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})} EST`,
+      color: 0xff0000,
+      footer: {
+        text: 'LFCSD Days Report System'
+      }
+    }]
+  };
+
+  fetch(webhookURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('Report sent successfully! The admin has been notified.');
+    } else {
+      throw new Error('Failed to send report');
+    }
+  })
+  .catch(error => {
+    console.error('Error sending report:', error);
+    alert('Failed to send report. Please try again later.');
+  });
+}
