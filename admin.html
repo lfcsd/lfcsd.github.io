@@ -376,6 +376,72 @@
         }
       }
     });
+
+  // Announcement Functions
+async function setAnnouncement() {
+  const message = document.getElementById('announcementText').value.trim();
+  const color = document.getElementById('announcementColor').value.trim() || '#6a0dad';
+  
+  if (!message) {
+    alert('Please enter an announcement message');
+    return;
+  }
+
+  if (!/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
+    alert('Please enter a valid hex color (e.g., #6a0dad)');
+    return;
+  }
+
+  try {
+    await db.collection("announcements").doc("current").set({
+      message: message,
+      color: color,
+      lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert('Announcement set successfully!');
+  } catch (error) {
+    console.error("Error:", error);
+    alert('Error: ' + error.message);
+  }
+}
+
+async function clearAnnouncement() {
+  try {
+    await db.collection("announcements").doc("current").delete();
+    document.getElementById('announcementText').value = '';
+    document.getElementById('announcementColor').value = '#6a0dad';
+    alert('Announcement cleared successfully!');
+  } catch (error) {
+    console.error("Error:", error);
+    alert('Error: ' + error.message);
+  }
+}
+
+// Color picker and preview
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('colorPicker').addEventListener('input', function(e) {
+    document.getElementById('announcementColor').value = e.target.value;
+    updatePreview();
+  });
+
+  document.getElementById('announcementColor').addEventListener('input', function(e) {
+    if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+      document.getElementById('colorPicker').value = e.target.value;
+    }
+    updatePreview();
+  });
+
+  document.getElementById('announcementText').addEventListener('input', updatePreview);
+});
+
+function updatePreview() {
+  const text = document.getElementById('announcementText').value;
+  const color = document.getElementById('announcementColor').value;
+  const preview = document.querySelector('.preview-content');
+  
+  preview.textContent = text || "Your announcement will appear here";
+  preview.style.backgroundColor = color || '#6a0dad';
+}
   </script>
 </body>
 </html>
