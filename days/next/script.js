@@ -144,22 +144,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
   onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
   const announcementBar = document.getElementById('announcementBar');
-  const container = document.querySelector('.container');
   
   if (docSnapshot.exists() && docSnapshot.data().message) {
     const data = docSnapshot.data();
     announcementBar.textContent = data.message;
     announcementBar.style.backgroundColor = data.color || '#6a0dad';
     announcementBar.style.display = 'block';
-    container.style.marginTop = '60px';
+    
+    // Add class to body when announcement exists
+    document.body.classList.add('has-announcement');
   } else {
     announcementBar.style.display = 'none';
-    container.style.marginTop = '0';
+    document.body.classList.remove('has-announcement');
   }
 }, (error) => {
   console.error("Announcement error:", error);
   document.getElementById('announcementBar').style.display = 'none';
-  document.querySelector('.container').style.marginTop = '0';
+  document.body.classList.remove('has-announcement');
 });
 
 // Update the report button to specify "Next Day" in the Discord message
