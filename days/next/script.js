@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Menu functionality (same as main page)
+  // Menu functionality
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
   
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Time display (same as main page)
+  // Time display (EST)
   function updateTime() {
     const options = {
       timeZone: 'America/New_York',
@@ -28,23 +28,38 @@ document.addEventListener('DOMContentLoaded', function() {
   updateTime();
   setInterval(updateTime, 60000);
 
+  // Main logic
   if (window.firebase?.db) {
     const { db } = window.firebase;
     const nextDayText = document.getElementById('nextDayText');
     const nextDaySchedule = document.getElementById('nextDaySchedule');
+    const announcementBar = document.getElementById('announcementBar');
 
-    function getDefaultSettings() {
-      return {
-        manualDay: null,
-        schedule: "Regular Day",
-        autoMode: true
-      };
+    // ======================
+    // DAY CALCULATION LOGIC (UPDATED FOR MIDNIGHT EST)
+    // ======================
+    const START_DATE = new Date('2025-03-26T00:00:00-05:00'); // Known Day 1 in EST
+
+    function getCurrentESTDate() {
+      const now = new Date();
+      const estTime = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+      return new Date(estTime);
     }
 
-    // Calculate next school day
+    function calculateCurrentDay() {
+      const estNow = getCurrentESTDate();
+      const diffTime = estNow - START_DATE;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return (diffDays % 2) + 1; // Returns 1 or 2
+    }
+
+    function getNextDayNumber() {
+      return calculateCurrentDay() === 1 ? 2 : 1;
+    }
+
     function getNextSchoolDate() {
-      const today = new Date();
-      let nextDay = new Date(today);
+      const estNow = getCurrentESTDate();
+      let nextDay = new Date(estNow);
       
       // Skip weekends (0=Sunday, 6=Saturday)
       do {
@@ -54,26 +69,44 @@ document.addEventListener('DOMContentLoaded', function() {
       return nextDay;
     }
 
-    // Calculate day number (1 or 2)
-    function calculateDayNumber(date) {
-      const startDate = new Date('2025-03-26'); // Your known Day 1
-      const diffTime = date - startDate;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      return (diffDays % 2) + 1; // Alternates between 1 and 2
+    function getDefaultSettings() {
+      return {
+        manualDay: null,
+        schedule: "Regular Day",
+        autoMode: true
+      };
     }
 
-   import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
+    // Initialize Firestore
+    import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
       .then(({ onSnapshot, doc }) => {
+        // Announcement listener
+        onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
+          if (docSnapshot.exists() && docSnapshot.data().message) {
+            const data = docSnapshot.data();
+            announcementBar.textContent = data.message;
+            announcementBar.style.backgroundColor = data.color || '#6a0dad';
+            announcementBar.style.display = 'block';
+            document.body.classList.add('has-announcement');
+          } else {
+            announcementBar.style.display = 'none';
+            document.body.classList.remove('has-announcement');
+          }
+        }, (error) => {
+          console.error("Announcement error:", error);
+          announcementBar.style.display = 'none';
+          document.body.classList.remove('has-announcement');
+        });
+
+        // Next day settings listener
         const unsubscribe = onSnapshot(doc(db, "nextDaySettings", "current"), 
           (docSnapshot) => {
             let data = getDefaultSettings();
             if (docSnapshot.exists()) {
               const docData = docSnapshot.data();
-              // Merge with defaults
               data = {
                 ...data,
                 ...docData,
-                // Ensure manualDay is valid
                 manualDay: (docData.manualDay === 1 || docData.manualDay === 2) ? docData.manualDay : null
               };
             }
@@ -95,26 +128,27 @@ document.addEventListener('DOMContentLoaded', function() {
           badge.textContent = data.schedule || 'Regular Day';
           nextDaySchedule.appendChild(badge);
 
-          // Day display logic - matches main page behavior exactly
+          // Day display logic - UPDATED FOR MIDNIGHT EST
           if (data.autoMode && data.manualDay === null) {
-            // Automatic mode - calculate next day
-            const dayNumber = calculateDayNumber(getNextSchoolDate());
-            nextDayText.textContent = `Day ${dayNumber}`;
+            // Automatic mode - calculate based on EST midnight
+            nextDayText.textContent = `Day ${getNextDayNumber()}`;
           } else if (data.manualDay === 1 || data.manualDay === 2) {
-            // Manual override - show the set day
+            // Manual override
             nextDayText.textContent = `Day ${data.manualDay}`;
           } else {
-            // Invalid state - fallback to calculation
-            const dayNumber = calculateDayNumber(getNextSchoolDate());
-            nextDayText.textContent = `Day ${dayNumber}`;
+            // Fallback to automatic calculation
+            nextDayText.textContent = `Day ${getNextDayNumber()}`;
           }
         }
       })
       .catch(error => {
         console.error("Failed to load Firestore:", error);
-        const dayNumber = calculateDayNumber(getNextSchoolDate());
-        nextDayText.textContent = `Day ${dayNumber}`;
+        // Fallback display
+        nextDayText.textContent = `Day ${getNextDayNumber()}`;
         nextDaySchedule.innerHTML = '<span class="schedule-badge">Regular Day</span>';
       });
+  } else {
+    console.error("Firebase not initialized!");
+    nextDayText.textContent = "System Error";
   }
 });
