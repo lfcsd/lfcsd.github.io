@@ -119,21 +119,63 @@
       cursor: pointer;
     }
 
-    .announcement-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+   /* Announcement Controls */
+.announcement-controls {
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-    .announcement-controls textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      font-family: 'Lexend', sans-serif;
-      resize: vertical;
-      min-height: 80px;
-    }
+.admin-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-family: 'Lexend', sans-serif;
+}
+
+.color-picker {
+  margin: 15px 0;
+}
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#colorPicker {
+  width: 50px;
+  height: 40px;
+  cursor: pointer;
+}
+
+#announcementColor {
+  flex: 1;
+}
+
+.apply-btn { background-color: #4CAF50; }
+.clear-btn { background-color: #f44336; }
+
+.announcement-preview {
+  margin-top: 20px;
+  border: 1px dashed #ccc;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.preview-text {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.preview-content {
+  padding: 12px;
+  background-color: #6a0dad;
+  color: white;
+  border-radius: 4px;
+  text-align: center;
+}
 
     .form-group {
       margin-bottom: 15px;
@@ -203,16 +245,30 @@
   <h2>Announcement Controls</h2>
   <div class="announcement-controls">
     <div class="form-group">
-      <label>Announcement Text:</label>
-      <textarea id="announcementText" rows="3" placeholder="Enter your announcement..."></textarea>
+      <label for="announcementText">Message:</label>
+      <textarea id="announcementText" rows="3" placeholder="Enter announcement text..." class="admin-input"></textarea>
     </div>
-    <div class="form-group">
-      <label>Background Color (Hex):</label>
-      <input type="text" id="announcementColor" placeholder="#6a0dad" value="#6a0dad">
+    
+    <div class="form-group color-picker">
+      <label for="announcementColor">Background Color:</label>
+      <div class="color-input-wrapper">
+        <input type="color" id="colorPicker" value="#6a0dad" title="Choose color">
+        <input type="text" id="announcementColor" placeholder="#6a0dad" value="#6a0dad" class="admin-input">
+      </div>
     </div>
+    
     <div class="admin-buttons">
-      <button class="admin-btn" onclick="setAnnouncement()">Apply Announcement</button>
-      <button class="admin-btn" onclick="clearAnnouncement()">Clear Announcement</button>
+      <button class="admin-btn apply-btn" onclick="setAnnouncement()">
+        <i class="fas fa-bullhorn"></i> Apply Announcement
+      </button>
+      <button class="admin-btn clear-btn" onclick="clearAnnouncement()">
+        <i class="fas fa-times"></i> Clear Announcement
+      </button>
+    </div>
+    
+    <div class="announcement-preview" id="announcementPreview">
+      <span class="preview-text">Preview:</span>
+      <div class="preview-content">Your announcement will appear here</div>
     </div>
   </div>
 </div>
