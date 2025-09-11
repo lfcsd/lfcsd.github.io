@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // ======================
   // 3. DAY CALCULATION (MIDNIGHT EST SWITCH)
   // ======================
-  const START_DATE = new Date('2025-09-11T00:00:00-05:00'); // Known Day 1 in EST
+  const START_DATE = new Date('2025-10-09T00:00:00-05:00'); // Known Day 1 in EST
 
   function getCurrentESTDate() {
     const now = new Date();
