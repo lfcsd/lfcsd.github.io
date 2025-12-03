@@ -1,0 +1,192 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Lexend', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #6a0dad, #8a2be2);
+  min-height: 100vh;
+  color: white;
+}
+
+/* ✅ NAV BAR */
+
+.navbar {
+  height: 64px;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-logo {
+  height: 36px;
+}
+
+.nav-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.nav-menu-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 64px;
+  right: 16px;
+  background: rgba(0,0,0,0.85);
+  border-radius: 10px;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nav-dropdown a {
+  color: white;
+  padding: 12px 20px;
+  text-decoration: none;
+}
+
+.nav-dropdown a:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ✅ MAIN CARD */
+
+.card {
+  margin: 110px auto 0;
+  width: 90%;
+  max-width: 420px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 24px;
+  padding: 30px;
+  text-align: center;
+  backdrop-filter: blur(15px);
+}
+
+.main-logo {
+  width: 90px;
+  margin-bottom: 20px;
+}
+
+.day-text {
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+.schedule-badge {
+  background: rgba(255,255,255,0.25);
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.time-display {
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+/* ✅ FOOTER */
+
+.footer {
+  text-align: center;
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* ✅ ANNOUNCEMENT */
+
+.announcement-bar {
+  position: fixed;
+  top: 64px;
+  width: 100%;
+  background: #6a0dad;
+  text-align: center;
+  padding: 10px;
+  display: none;
+}
+
+/* ✅ INSTALL POPUP */
+
+.install-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.install-popup.hidden {
+  display: none;
+}
+
+.popup-card {
+  background: #1a1a1a;
+  padding: 26px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 340px;
+  text-align: center;
+}
+
+.platform-toggle {
+  display: flex;
+  margin: 16px 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.platform-btn {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  background: #333;
+  color: white;
+}
+
+.platform-btn.active {
+  background: #8a2be2;
+}
+
+.install-instructions {
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.dismiss-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
