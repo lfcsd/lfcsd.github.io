@@ -1,68 +1,43 @@
 // service-worker.js
-const CACHE_NAME = 'lfcsd-shell-v1';
-const OFFLINE_ASSETS = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
-  '/logo.png',
-  // add any other assets you want cached
-];
 
-self.addEventListener('install', (e) => {
-  self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(OFFLINE_ASSETS))
-  );
-});
-
-self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', (e) => {
-  // network-first for dynamic data (let browser handle), fallback to cache
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
-  );
-});
-
-// Show a notification for incoming push messages
+// Listen to push events from the browser
 self.addEventListener('push', function(event) {
-  let payload = {};
+  let data = {};
   try {
-    payload = event.data ? event.data.json() : {};
-  } catch (err) {
-    payload = { title: 'LFCSD', body: event.data?.text() || 'Update' };
+    data = event.data.json();
+  } catch (e) {
+    data = { title: "LFCSD Days", body: event.data.text() };
   }
-  const title = payload.title || 'LFCSD Update';
+
   const options = {
-    body: payload.body || 'Tap to open.',
-    icon: '/logo.png',
-    badge: '/logo.png',
-    data: payload.data || {}
+    body: data.body || 'No message content',
+    icon: data.icon || '/logo.png',
+    badge: data.badge || '/logo.png',
+    tag: data.tag || 'lfcsd-days', // avoid duplicates
+    renotify: true,
+    data: data.data || {}
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'LFCSD Days', options)
+  );
 });
 
-// respond to messages from page (for immediate notifications)
-self.addEventListener('message', (event) => {
-  const data = event.data || {};
-  if (data.type === 'show-notification') {
-    const title = data.title || 'LFCSD';
-    const options = { body: data.body || '', icon: '/logo.png' };
-    self.registration.showNotification(title, options);
-  }
-});
-
-self.addEventListener('notificationclick', (e) => {
-  e.notification.close();
-  e.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-      if (clientList.length > 0) {
-        return clientList[0].focus();
+// Optional: handle notification click
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+      // Focus existing tab or open a new one
+      for (const client of clientList) {
+        if (client.url === '/' && 'focus' in client) return client.focus();
       }
-      return clients.openWindow('/');
+      if (clients.openWindow) return clients.openWindow('/');
     })
   );
+});
+
+// Optional: handle push subscription updates
+self.addEventListener('pushsubscriptionchange', function(event) {
+  console.log('Push subscription changed:', event);
 });
