@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <title>LFCSD Days</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon-lfcsd.png">
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Firebase Init -->
+  <!-- Firebase Init (keeps your existing config) -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
@@ -26,68 +26,76 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     window.firebase = { db, app };
   </script>
 
   <script src="script.js" defer></script>
 </head>
-
 <body>
 
-<!-- ✅ NAVBAR -->
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main">
   <div class="nav-left">
-    <img src="/logo.png" class="nav-logo">
+    <img src="logo.png" alt="LFCSD Logo" class="nav-logo">
     <span class="nav-title">LFCSD Days</span>
   </div>
 
   <div class="nav-right">
-    <button id="menuBtn" class="nav-menu-btn">
-      <i class="fas fa-bars"></i>
-    </button>
-    <div id="dropdownMenu" class="nav-dropdown">
-      <a href="/">Today's Day</a>
-      <a href="/days/next/">Next Day</a>
+    <button id="menuBtn" class="nav-menu-btn" aria-expanded="false" aria-controls="dropdownMenu"><i class="fas fa-bars"></i></button>
+
+    <div id="dropdownMenu" class="nav-dropdown" role="menu" aria-hidden="true">
+      <a href="/" role="menuitem">Today's Day</a>
+      <a href="/days/next/" role="menuitem">Next Day</a>
+      <hr>
+      <button id="enableNotifBtn" class="dropdown-action">Enable Notifications</button>
+      <button id="subscribePushBtn" class="dropdown-action">Subscribe to Push</button>
     </div>
   </div>
 </nav>
 
-<!-- ✅ ANNOUNCEMENT -->
-<div id="announcementBar" class="announcement-bar"></div>
+<div id="announcementBar" class="announcement-bar" role="status" aria-live="polite"></div>
 
-<!-- ✅ MAIN CARD -->
-<main class="card">
-  <img src="/logo.png" class="main-logo">
-
+<main class="card" role="main">
+  <img src="logo.png" class="main-logo" alt="logo">
   <div id="specialSchedule"></div>
   <div id="dayText" class="day-text">Loading...</div>
-  <div id="timeDisplay" class="time-display"></div>
+  <div id="timeDisplay" class="time-display" aria-live="polite"></div>
+
+  <div class="controls-row">
+    <button id="reportBtn" class="pill report-pill" title="Report this day">Report</button>
+  </div>
 </main>
 
-<!-- ✅ FOOTER -->
-<footer class="footer">
-  This website is not affiliated with LFCSD
-</footer>
+<footer class="footer">This website is not affiliated with LFCSD</footer>
 
-<!-- ✅ MOBILE INSTALL POPUP -->
-<div id="installPopup" class="install-popup hidden">
+<!-- Improved Install Popup (mobile-first but shows on desktop if beforeinstallprompt available) -->
+<div id="installPopup" class="install-popup hidden" role="dialog" aria-modal="true" aria-label="Install web app">
   <div class="popup-card">
-    <h2>Get the Web App</h2>
-    <p>The web app is faster, more optimized, and includes notifications.</p>
-
-    <div class="platform-toggle">
-      <button class="platform-btn active" data-platform="ios">iOS</button>
-      <button class="platform-btn" data-platform="android">Android</button>
+    <div class="popup-top">
+      <h2>Get the LFCSD Web App</h2>
+      <p class="muted">The web app is faster, more optimized, and supports notifications & reminders.</p>
     </div>
 
-    <div id="installInstructions" class="install-instructions">
+    <div class="platform-toggle" role="tablist">
+      <button class="platform-btn active" data-platform="ios" role="tab">iOS</button>
+      <button class="platform-btn" data-platform="android" role="tab">Android</button>
+    </div>
+
+    <div id="installInstructions" class="install-instructions" aria-live="polite">
       Tap the Share icon, then select "Add to Home Screen".
     </div>
 
-    <button id="dismissInstall" class="dismiss-btn">Dismiss</button>
+    <div class="popup-actions">
+      <button id="installAction" class="cta">Install</button>
+      <button id="dismissInstall" class="dismiss">Dismiss</button>
+    </div>
   </div>
 </div>
 
+<script>
+  // Register service worker immediately (script.js also checks again)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js').catch(e => console.warn('SW failed:', e));
+  }
+</script>
 </body>
 </html>
