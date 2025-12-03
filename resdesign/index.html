@@ -29,6 +29,9 @@
     window.firebase = { db, app };
   </script>
 
+  <!-- OneSignal SDK -->
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -47,7 +50,6 @@
       <a href="/days/next/" role="menuitem">Next Day</a>
       <hr>
       <button id="enableNotifBtn" class="dropdown-action">Enable Notifications</button>
-      <button id="subscribePushBtn" class="dropdown-action">Subscribe to Push</button>
     </div>
   </div>
 </nav>
@@ -67,11 +69,11 @@
 
 <footer class="footer">This website is not affiliated with LFCSD</footer>
 
-<!-- Improved Install Popup (mobile-first but shows on desktop if beforeinstallprompt available) -->
+<!-- Improved Install Popup -->
 <div id="installPopup" class="install-popup hidden" role="dialog" aria-modal="true" aria-label="Install web app">
   <div class="popup-card">
     <div class="popup-top">
-      <h2>Get the LFCSD Web App</h2>
+      <h2>Get the LFCSD Days Web App</h2>
       <p class="muted">The web app is faster, more optimized, and supports notifications & reminders.</p>
     </div>
 
@@ -92,7 +94,7 @@
 </div>
 
 <script>
-  // Register service worker immediately (script.js also checks again)
+  // Register service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js').catch(e => console.warn('SW failed:', e));
   }
