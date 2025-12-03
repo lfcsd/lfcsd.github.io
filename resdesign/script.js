@@ -1,223 +1,241 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async function() {
+  // ======================
+  // 0. Firebase check
+  // ======================
   if (!window.firebase?.db) {
     console.error("Firebase not initialized!");
     document.getElementById('dayText').textContent = "System Error";
     return;
   }
-
   const { db } = window.firebase;
 
+  // ======================
+  // 1. MENU BUTTON
+  // ======================
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
-  const reportBtn = document.getElementById('reportBtn');
-  const enableNotifBtn = document.getElementById('enableNotifBtn');
-  const subscribePushBtn = document.getElementById('subscribePushBtn');
-  const timeDisplay = document.getElementById('timeDisplay');
-  const dayTextElement = document.getElementById('dayText');
-  const specialScheduleElement = document.getElementById('specialSchedule');
-  const announcementBar = document.getElementById('announcementBar');
 
-  const installPopup = document.getElementById('installPopup');
-  const dismissInstall = document.getElementById('dismissInstall');
-  const installAction = document.getElementById('installAction');
-  const platformBtns = document.querySelectorAll('.platform-btn');
-  const installInstructions = document.getElementById('installInstructions');
-
-  const isMobile = window.innerWidth <= 768;
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-  /* ============================
-     MOBILE-ONLY SETTINGS
-  ============================ */
-  if (!isMobile) {
-    enableNotifBtn.style.display = 'none';
-    subscribePushBtn.style.display = 'none';
-  }
-
-  /* ============================
-     DROPDOWN MENU FIX
-  ============================ */
-  menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  menuBtn.addEventListener('click', function() {
     dropdownMenu.classList.toggle('show');
-    menuBtn.setAttribute('aria-expanded', dropdownMenu.classList.contains('show'));
+    menuBtn.setAttribute("aria-expanded", dropdownMenu.classList.contains('show'));
   });
 
-  document.addEventListener('click', (e) => {
-    if (!dropdownMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+  document.addEventListener('click', function(e) {
+    if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
       dropdownMenu.classList.remove('show');
-      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute("aria-expanded", false);
     }
   });
 
-  /* ============================
-     LIVE EST CLOCK
-  ============================ */
+  // ======================
+  // 2. REPORT BUTTON
+  // ======================
+  const reportBtn = document.getElementById('reportBtn');
+  reportBtn.addEventListener('click', function() {
+    if (confirm('Are you sure you want to report this day as incorrect? This will notify the site administrator.')) {
+      const webhookURL = 'https://discord.com/api/webhooks/1354971848944779284/IfbRlUhpkTNh02jb5nH3oRE_Epdv-lNwJ2mJFntGiDXZKD-fqaVy7kDd2WTMbaXTJNIk';
+      const message = {
+        content: 'Hey <@957691566271660102>! A user reported the current day may be incorrect!',
+        embeds: [{
+          title: 'Day Report',
+          description: `Page: Current Day\nReported at: ${new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})} EST`,
+          color: 0xff0000
+        }]
+      };
+      fetch(webhookURL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(message)})
+        .then(res => res.ok ? alert("Report sent!") : Promise.reject("Failed"))
+        .catch(err => { console.error(err); alert("Failed to send report"); });
+    }
+  });
+
+  // ======================
+  // 3. LIVE CLOCK
+  // ======================
   function updateESTTime() {
-    const options = {
-      timeZone: 'America/New_York',
-      weekday: 'long',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
-    };
-    timeDisplay.textContent = new Date().toLocaleString('en-US', options);
+    const options = { timeZone:'America/New_York', weekday:'long', hour:'numeric', minute:'numeric', hour12:true };
+    document.getElementById('timeDisplay').textContent = new Date().toLocaleString('en-US', options);
   }
   updateESTTime();
   setInterval(updateESTTime, 60000);
 
-  /* ============================
-     DAY CALCULATION WITH TENSE
-  ============================ */
+  // ======================
+  // 4. DAY CALCULATION
+  // ======================
   const START_DATE = new Date('2025-10-09T00:00:00-05:00');
 
   function getCurrentESTDate() {
     const now = new Date();
-    const est = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
-    return new Date(est);
+    const estStr = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+    return new Date(estStr);
   }
 
-  function calculateDay(offset = 0) {
-    const base = getCurrentESTDate();
-    base.setDate(base.getDate() + offset);
-    const diffTime = base - START_DATE;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return (diffDays % 2) + 1;
+  function calculateCurrentDay() {
+    const estNow = getCurrentESTDate();
+    const diffTime = estNow - START_DATE;
+    const diffDays = Math.floor(diffTime / (1000*60*60*24));
+    return (diffDays % 2) + 1; // Day 1 or 2
   }
 
-  function getTenseText(day) {
-    const est = getCurrentESTDate();
-    const hour = est.getHours();
-
-    if (hour >= 15 && hour < 24) {
-      return `Today was a Day ${day}`;
-    } else if (hour >= 0 && hour < 6) {
-      return `Today will be a Day ${calculateDay(1)}`;
-    } else {
-      return `Today is a Day ${day}`;
-    }
+  function getDayText(scheduleData) {
+    const now = getCurrentESTDate();
+    const hour = now.getHours();
+    const day = (scheduleData.autoMode !== false && !scheduleData.manualDay) ? calculateCurrentDay() : scheduleData.manualDay;
+    if (hour >= 15) return `Today was a Day ${day}`; // After school hours
+    if (hour < 0) return `Today will be a Day ${day}`; // Midnight
+    return `Today is a Day ${day}`; // Default
   }
 
-  /* ============================
-     FIRESTORE LISTENERS
-  ============================ */
-  const { onSnapshot, doc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+  // ======================
+  // 5. FIRESTORE LISTENERS
+  // ======================
+  const announcementRef = db.collection("announcements").doc("current");
+  const settingsRef = db.collection("settings").doc("current");
+  const nextDayRef = db.collection("nextDaySettings").doc("current");
 
-  onSnapshot(doc(db, "announcements", "current"), (snap) => {
-    if (snap.exists() && snap.data().message) {
-      const data = snap.data();
-      announcementBar.textContent = data.message;
-      announcementBar.style.backgroundColor = data.color || '#6a0dad';
-      announcementBar.style.display = 'block';
-    } else {
-      announcementBar.style.display = 'none';
-    }
+  announcementRef.onSnapshot(docSnap => {
+    const bar = document.getElementById('announcementBar');
+    if (docSnap.exists() && docSnap.data().message) {
+      const data = docSnap.data();
+      bar.textContent = data.message;
+      bar.style.backgroundColor = data.color || "#6a0dad";
+      bar.style.display = "block";
+    } else bar.style.display = "none";
   });
 
-  onSnapshot(doc(db, "settings", "current"), (snap) => {
-    const data = snap.data() || {
-      manualDay: null,
-      schedule: "Regular Day",
-      autoMode: true
-    };
+  function updateDayDisplay(data, targetId='dayText') {
+    const dayTextEl = document.getElementById(targetId);
+    const scheduleEl = document.getElementById('specialSchedule');
+    dayTextEl.textContent = getDayText(data);
 
-    specialScheduleElement.innerHTML = '';
-
+    scheduleEl.innerHTML = '';
     const badge = document.createElement('span');
-    badge.textContent = data.schedule || "Regular Day";
-    specialScheduleElement.appendChild(badge);
+    badge.className = 'schedule-badge';
+    badge.textContent = data.schedule || 'Regular Day';
+    scheduleEl.appendChild(badge);
+  }
 
-    const today = new Date().getDay();
-    if (today === 0 || today === 6) {
-      dayTextElement.textContent = "No School";
-      return;
-    }
-
-    const day = data.autoMode !== false && !data.manualDay
-      ? calculateDay()
-      : Number(data.manualDay);
-
-    dayTextElement.textContent = getTenseText(day);
+  settingsRef.onSnapshot(docSnap => {
+    if (docSnap.exists()) updateDayDisplay(docSnap.data());
   });
 
-  /* ============================
-     NEXT DAY (NO NAVIGATION)
-  ============================ */
-  document.querySelectorAll('a[href="/days/next/"]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const nextDay = calculateDay(1);
-      dayTextElement.textContent = `Tomorrow will be a Day ${nextDay}`;
-      dropdownMenu.classList.remove('show');
-    });
+  nextDayRef.onSnapshot(docSnap => {
+    if (docSnap.exists()) updateDayDisplay(docSnap.data(), 'dayText'); // Could add a separate element if needed
   });
 
-  /* ============================
-     REPORT BUTTON
-  ============================ */
-  reportBtn.addEventListener('click', () => {
-    if (!confirm("Report incorrect day?")) return;
-
-    fetch('https://discord.com/api/webhooks/1354971848944779284/IfbRlUhpkTNh02jb5nH3oRE_Epdv-lNwJ2mJFntGiDXZKD-fqaVy7kDd2WTMbaXTJNIk', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: "A user reported today may be incorrect."
-      })
-    });
-
-    alert("Report sent.");
-  });
-
-  /* ============================
-     PWA INSTALL HANDLING
-  ============================ */
-  let deferredPrompt = null;
+  // ======================
+  // 6. PWA INSTALL POPUP
+  // ======================
+  let deferredPrompt;
+  const installPopup = document.getElementById('installPopup');
+  const installBtn = document.getElementById('installAction');
+  const dismissBtn = document.getElementById('dismissInstall');
 
   window.addEventListener('beforeinstallprompt', (e) => {
-    if (isPWA) return; // ✅ DO NOT SHOW IF ALREADY A PWA
-
     e.preventDefault();
     deferredPrompt = e;
-    installPopup.classList.remove('hidden');
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+      installPopup.classList.remove('hidden');
+    }
   });
 
-  dismissInstall.addEventListener('click', () => {
-    installPopup.classList.add('hidden');
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installPopup.classList.add('hidden');
+    }
   });
 
-  installAction.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    installPopup.classList.add('hidden');
-  });
+  dismissBtn.addEventListener('click', () => installPopup.classList.add('hidden'));
 
-  /* ============================
-     PLATFORM INSTRUCTIONS
-  ============================ */
-  platformBtns.forEach(btn => {
+  // Platform toggle instructions
+  document.querySelectorAll('.platform-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      platformBtns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.platform-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-
-      installInstructions.textContent =
-        btn.dataset.platform === "android"
-          ? 'Tap the menu (⋮) and select "Add to Home Screen".'
-          : 'Tap Share → "Add to Home Screen"';
+      const instructions = document.getElementById('installInstructions');
+      instructions.textContent = btn.dataset.platform === 'ios' ?
+        'Tap the Share icon, then select "Add to Home Screen".' :
+        'Tap the menu, then select "Add to Home Screen".';
     });
   });
 
-  /* ============================
-     NOTIFICATION PERMISSIONS
-  ============================ */
-  enableNotifBtn?.addEventListener('click', async () => {
-    const permission = await Notification.requestPermission();
-    alert(permission === 'granted' ? "Notifications Enabled" : "Notifications Blocked");
-  });
+  // ======================
+  // 7. PUSH NOTIFICATIONS
+  // ======================
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isAndroid = /Android/.test(navigator.userAgent);
+  const notifBtn = document.getElementById('enableNotifBtn');
 
-  subscribePushBtn?.addEventListener('click', () => {
-    alert("Push subscription system ready for server integration.");
-  });
+  if (notifBtn && window.innerWidth <= 768) {
+    notifBtn.style.display = "block";
+    notifBtn.addEventListener('click', requestNotificationPermission);
+  } else if (notifBtn) notifBtn.style.display = "none";
+
+  async function requestNotificationPermission() {
+    if (!('Notification' in window)) return alert("Notifications not supported.");
+    let permission = await Notification.requestPermission();
+    if (permission !== "granted") return alert("Permission denied.");
+
+    if (!isIOS) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array("BDCwJOe_9loznu0yeRBZoYhxg_LvzR5TA6ekWhQgTS6n9JvmrJWQdgZcSRw1OHswUSmnUV3VSo-FzrQtcCAl_5s")
+        });
+
+        await db.collection("push_subscriptions").doc(subscription.endpoint).set({
+          token: subscription.endpoint,
+          platform: isAndroid ? "android" : "web",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastSeenAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Notifications enabled!");
+      } catch(err) { console.error(err); alert("Push subscription failed"); }
+    } else {
+      alert("iOS Safari cannot receive background notifications. Alerts will appear in-app when open.");
+    }
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+  }
+
+  // ======================
+  // 8. LISTEN FOR NOTIFICATIONS (Firestore outbox)
+  // ======================
+  db.collection("notification_outbox").where("sent", "==", false)
+    .onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          if (Notification.permission === "granted") {
+            new Notification(data.title, { body: data.body, icon: data.icon || undefined });
+          } else if (isIOS) {
+            showInAppBanner(data.title, data.body);
+          }
+        }
+      });
+    });
+
+  function showInAppBanner(title, body) {
+    const banner = document.createElement('div');
+    banner.className = "in-app-banner";
+    banner.innerHTML = `<strong>${title}</strong><p>${body}</p>`;
+    document.body.appendChild(banner);
+    setTimeout(()=>banner.remove(),8000);
+  }
+
+  // ======================
+  // 9. REGISTER SERVICE WORKER
+  // ======================
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+      .catch(e => console.warn('SW failed:', e));
+  }
 });
