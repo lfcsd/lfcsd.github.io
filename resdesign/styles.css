@@ -9,31 +9,24 @@
 
 html, body {
   width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-  background: linear-gradient(135deg, #6a0dad, #8a2be2, #9370db);
+  height: 100%;
+  overflow: hidden; /* KILLS WHITE SCROLL GAP */
   font-family: 'Lexend', sans-serif;
   color: white;
-}
-
-/* Prevent white space on scroll */
-body {
-  min-height: 100vh;
-  overflow-y: hidden;
-  position: relative;
+  background: linear-gradient(135deg, #6a0dad, #8a2be2, #9370db);
 }
 
 /* =========================
-   NAV BAR
+   NAVBAR
 ========================= */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
   height: 60px;
+  width: 100%;
   padding: 0 16px;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0,0,0,0.4);
   backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
@@ -48,131 +41,70 @@ body {
 }
 
 .nav-logo {
-  height: 40px;
+  height: 38px;
 }
 
 .nav-title {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
 }
 
-.menu-btn,
-.report-btn {
-  background: rgba(255, 255, 255, 0.15);
+.nav-menu-btn {
+  background: rgba(255,255,255,0.15);
+  color: white;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
+  border: none;
   cursor: pointer;
-  transition: 0.2s;
+  font-size: 18px;
 }
 
-.menu-btn:hover,
-.report-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.exclamation-mark {
-  font-weight: bold;
-  font-size: 20px;
+.nav-menu-btn:hover {
+  background: rgba(255,255,255,0.25);
 }
 
 /* =========================
-   DROPDOWN MENU (FIXED)
+   DROPDOWN MENU
 ========================= */
-.dropdown-menu {
-  position: fixed;
-  top: 70px;
+.nav-dropdown {
+  position: absolute;
+  top: 60px;
   right: 16px;
-  background: rgba(20, 20, 20, 0.95);
-  border-radius: 12px;
-  padding: 8px 0;
+  background: rgba(15,15,15,0.96);
+  border-radius: 14px;
+  min-width: 220px;
   display: none;
   flex-direction: column;
-  min-width: 200px;
-  z-index: 3000;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.45);
 }
 
-.dropdown-menu.show {
-  display: flex;
-}
-
-.menu-item {
-  padding: 12px 18px;
-  text-decoration: none;
+.nav-dropdown a,
+.dropdown-action {
+  padding: 14px 16px;
+  text-align: left;
+  background: none;
+  border: none;
   color: white;
+  text-decoration: none;
+  cursor: pointer;
   font-size: 0.95rem;
 }
 
-.menu-item:hover {
-  background: rgba(255,255,255,0.1);
+.nav-dropdown a:hover,
+.dropdown-action:hover {
+  background: rgba(255,255,255,0.08);
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
-.container {
-  height: calc(100vh - 140px);
-  margin-top: 80px;
+.nav-dropdown hr {
+  border: none;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+}
+
+.nav-dropdown.show {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;
-  text-align: center;
-}
-
-.logo {
-  height: 140px;
-}
-
-.day-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.day-text {
-  font-size: 4.5rem;
-  font-weight: 800;
-  text-shadow: 0 6px 14px rgba(0,0,0,0.4);
-}
-
-#specialSchedule {
-  min-height: 28px;
-}
-
-.schedule-badge {
-  background: rgba(0,0,0,0.4);
-  padding: 6px 18px;
-  border-radius: 20px;
-  font-size: 1.1rem;
-}
-
-/* =========================
-   LIVE CLOCK
-========================= */
-.time-display {
-  position: fixed;
-  bottom: 60px;
-  width: 100%;
-  text-align: center;
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-  position: fixed;
-  bottom: 16px;
-  width: 100%;
-  text-align: center;
-  font-size: 0.75rem;
-  opacity: 0.7;
 }
 
 /* =========================
@@ -181,101 +113,196 @@ body {
 .announcement-bar {
   position: fixed;
   top: 60px;
-  left: 0;
   width: 100%;
   padding: 10px;
-  text-align: center;
   background: #6a0dad;
+  text-align: center;
+  font-size: 0.9rem;
   z-index: 1500;
   display: none;
 }
 
 /* =========================
-   PWA INSTALL POPUP
+   MAIN CARD
 ========================= */
-#pwaModal {
+.card {
+  position: absolute;
+  inset: 0;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.main-logo {
+  width: 140px;
+}
+
+.day-text {
+  font-size: 4.5rem;
+  font-weight: 800;
+  text-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+#specialSchedule {
+  min-height: 28px;
+}
+
+#specialSchedule span {
+  background: rgba(0,0,0,0.45);
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 1.1rem;
+}
+
+/* =========================
+   TIME DISPLAY
+========================= */
+.time-display {
+  margin-top: 6px;
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+.controls-row {
+  margin-top: 14px;
+}
+
+.pill {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.report-pill {
+  background: rgba(255,255,255,0.18);
+  color: white;
+}
+
+.report-pill:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+  position: fixed;
+  bottom: 14px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+/* =========================
+   INSTALL POPUP
+========================= */
+.install-popup {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.75);
-  display: none;
-  justify-content: center;
+  display: flex;
   align-items: center;
+  justify-content: center;
   z-index: 5000;
 }
 
-.pwa-card {
+.install-popup.hidden {
+  display: none;
+}
+
+.popup-card {
   width: 90%;
   max-width: 420px;
-  background: #111;
-  border-radius: 20px;
+  background: #0f0f0f;
+  border-radius: 24px;
   padding: 22px;
-  text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.7);
 }
 
-.pwa-card h2 {
+.popup-top h2 {
   font-size: 1.4rem;
-  margin-bottom: 10px;
 }
 
-.pwa-card p {
+.muted {
+  opacity: 0.8;
   font-size: 0.9rem;
-  opacity: 0.85;
+  margin-top: 6px;
 }
 
-.platform-tabs {
+.platform-toggle {
+  margin-top: 16px;
   display: flex;
-  margin-top: 14px;
-  border-radius: 12px;
   overflow: hidden;
+  border-radius: 14px;
 }
 
-.platform-tabs button {
+.platform-btn {
   flex: 1;
-  border: none;
   padding: 10px;
-  font-weight: bold;
-  background: #222;
+  background: #1a1a1a;
+  border: none;
   color: white;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.platform-tabs button.active {
+.platform-btn.active {
   background: #6a0dad;
 }
 
-.pwa-instructions {
-  margin-top: 14px;
-  font-size: 0.85rem;
+.install-instructions {
+  margin-top: 16px;
+  font-size: 0.9rem;
   line-height: 1.5;
   opacity: 0.9;
 }
 
-.pwa-dismiss {
+.popup-actions {
   margin-top: 18px;
+  display: flex;
+  gap: 12px;
+}
+
+.cta {
+  flex: 1;
   padding: 12px;
+  border-radius: 14px;
   border: none;
-  border-radius: 12px;
   background: #6a0dad;
   color: white;
   font-weight: bold;
   cursor: pointer;
 }
 
+.dismiss {
+  flex: 1;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  cursor: pointer;
+}
+
 /* =========================
-   MOBILE RESPONSIVE
+   MOBILE ADJUSTMENTS
 ========================= */
 @media (max-width: 768px) {
-  .logo {
-    height: 100px;
-  }
-
   .day-text {
     font-size: 3.2rem;
   }
 
-  .time-display {
-    bottom: 54px;
-    font-size: 1rem;
+  .main-logo {
+    width: 110px;
   }
 }
