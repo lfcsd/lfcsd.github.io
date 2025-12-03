@@ -80,9 +80,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     const now = getCurrentESTDate();
     const hour = now.getHours();
     const day = (scheduleData.autoMode !== false && !scheduleData.manualDay) ? calculateCurrentDay() : scheduleData.manualDay;
-    if (hour >= 15) return `Today was a Day ${day}`; // After school hours
-    if (hour < 0) return `Today will be a Day ${day}`; // Midnight
-    return `Today is a Day ${day}`; // Default
+    if (hour >= 15) return `Today was a Day ${day}`;
+    if (hour < 0) return `Today will be a Day ${day}`;
+    return `Today is a Day ${day}`;
   }
 
   // ======================
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   });
 
   nextDayRef.onSnapshot(docSnap => {
-    if (docSnap.exists()) updateDayDisplay(docSnap.data(), 'dayText'); // Could add a separate element if needed
+    if (docSnap.exists()) updateDayDisplay(docSnap.data(), 'dayText');
   });
 
   // ======================
@@ -149,7 +149,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   dismissBtn.addEventListener('click', () => installPopup.classList.add('hidden'));
 
-  // Platform toggle instructions
   document.querySelectorAll('.platform-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.platform-btn').forEach(b=>b.classList.remove('active'));
@@ -162,80 +161,18 @@ document.addEventListener('DOMContentLoaded', async function() {
   });
 
   // ======================
-  // 7. PUSH NOTIFICATIONS
+  // 7. PUSH NOTIFICATIONS via OneSignal
   // ======================
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isAndroid = /Android/.test(navigator.userAgent);
   const notifBtn = document.getElementById('enableNotifBtn');
-
-  if (notifBtn && window.innerWidth <= 768) {
-    notifBtn.style.display = "block";
-    notifBtn.addEventListener('click', requestNotificationPermission);
-  } else if (notifBtn) notifBtn.style.display = "none";
-
-  async function requestNotificationPermission() {
-    if (!('Notification' in window)) return alert("Notifications not supported.");
-    let permission = await Notification.requestPermission();
-    if (permission !== "granted") return alert("Permission denied.");
-
-    if (!isIOS) {
-      try {
-        const registration = await navigator.serviceWorker.ready;
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array("BDCwJOe_9loznu0yeRBZoYhxg_LvzR5TA6ekWhQgTS6n9JvmrJWQdgZcSRw1OHswUSmnUV3VSo-FzrQtcCAl_5s")
+  if (notifBtn) {
+    notifBtn.addEventListener('click', () => {
+      if (!window.OneSignal) return alert("Notifications not supported.");
+      OneSignal.push(function() {
+        OneSignal.showNativePrompt().then(() => {
+          alert("Notifications enabled!");
         });
-
-        await db.collection("push_subscriptions").doc(subscription.endpoint).set({
-          token: subscription.endpoint,
-          platform: isAndroid ? "android" : "web",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          lastSeenAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Notifications enabled!");
-      } catch(err) { console.error(err); alert("Push subscription failed"); }
-    } else {
-      alert("iOS Safari cannot receive background notifications. Alerts will appear in-app when open.");
-    }
-  }
-
-  function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
-  }
-
-  // ======================
-  // 8. LISTEN FOR NOTIFICATIONS (Firestore outbox)
-  // ======================
-  db.collection("notification_outbox").where("sent", "==", false)
-    .onSnapshot(snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const data = change.doc.data();
-          if (Notification.permission === "granted") {
-            new Notification(data.title, { body: data.body, icon: data.icon || undefined });
-          } else if (isIOS) {
-            showInAppBanner(data.title, data.body);
-          }
-        }
       });
     });
-
-  function showInAppBanner(title, body) {
-    const banner = document.createElement('div');
-    banner.className = "in-app-banner";
-    banner.innerHTML = `<strong>${title}</strong><p>${body}</p>`;
-    document.body.appendChild(banner);
-    setTimeout(()=>banner.remove(),8000);
   }
 
-  // ======================
-  // 9. REGISTER SERVICE WORKER
-  // ======================
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .catch(e => console.warn('SW failed:', e));
-  }
 });
