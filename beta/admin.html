@@ -15,59 +15,87 @@
     color: white;
     min-height: 100vh;
   }
+
   .login-container, .admin-panel {
     max-width: 800px;
     margin: 50px auto;
-    padding: 20px;
+    padding: 25px;
     border-radius: 12px;
     background: rgba(0,0,0,0.7);
   }
+
   h2 {
     border-bottom: 1px solid #8a2be2;
     padding-bottom: 10px;
   }
+
   .form-group {
     margin-bottom: 15px;
     text-align: left;
   }
-  .form-group label {
+
+  label {
     display: block;
     margin-bottom: 5px;
+    font-weight: bold;
   }
-  input, textarea, button {
-    font-family: 'Lexend', sans-serif;
-  }
-  input, textarea {
+
+  input[type="email"],
+  input[type="password"],
+  input[type="text"],
+  input[type="color"],
+  textarea {
     width: 100%;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 12px;
+    border-radius: 10px;
     border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 16px;
     margin-bottom: 10px;
   }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(255,255,255,0.7);
+  }
+
   button {
     cursor: pointer;
     border: none;
-    border-radius: 6px;
-    padding: 10px 15px;
+    border-radius: 10px;
+    padding: 12px 20px;
     transition: background 0.3s;
+    font-size: 16px;
   }
+
   .login-btn { background: #8a2be2; color: white; width: 100%; }
   .login-btn:hover { background: #6a0dad; }
+
   .admin-btn { background: #8a2be2; color: white; margin: 5px; }
   .admin-btn:hover { background: #6a0dad; }
+
   .logout-btn { background: #ff6b6b; width: 100%; margin-top: 20px; }
+
   .announcement-preview, .notification-preview {
     margin-top: 15px;
     padding: 10px;
-    border-radius: 6px;
+    border-radius: 10px;
     text-align: center;
+    background: rgba(255,255,255,0.1);
   }
+
   .preview-content {
     padding: 12px;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-weight: bold;
   }
+
   .apply-btn { background-color: #4CAF50; }
+  .apply-btn:hover { background-color: #45a049; }
   .clear-btn { background-color: #f44336; }
+  .clear-btn:hover { background-color: #da2c2c; }
+
 </style>
 </head>
 <body>
@@ -79,11 +107,11 @@
   <form id="loginForm">
     <div class="form-group">
       <label>Email</label>
-      <input type="email" id="email" required>
+      <input type="email" id="email" placeholder="admin@example.com" required>
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="password" required>
+      <input type="password" id="password" placeholder="Enter password" required>
     </div>
     <button type="submit" class="login-btn">Login</button>
   </form>
@@ -91,39 +119,38 @@
 
 <!-- Admin Panel -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
-  <!-- Current Day Controls -->
+  <!-- Day Controls -->
   <div class="admin-section">
     <h2>Today's Day Controls</h2>
-    <button class="admin-btn" onclick="setDay('current', 1)">Day 1</button>
-    <button class="admin-btn" onclick="setDay('current', 2)">Day 2</button>
-    <button class="admin-btn" onclick="setSchedule('current', 'Half-Day')">Half-Day</button>
-    <button class="admin-btn" onclick="setSchedule('current', '2hr Delay')">2 Hour Delay</button>
-    <button class="admin-btn" onclick="setSchedule('current', 'Regular Day')">Regular Day</button>
+    <button class="admin-btn" onclick="setDay('current',1)">Day 1</button>
+    <button class="admin-btn" onclick="setDay('current',2)">Day 2</button>
+    <button class="admin-btn" onclick="setSchedule('current','Half-Day')">Half-Day</button>
+    <button class="admin-btn" onclick="setSchedule('current','2hr Delay')">2 Hour Delay</button>
+    <button class="admin-btn" onclick="setSchedule('current','Regular Day')">Regular Day</button>
     <button class="admin-btn" onclick="resetAuto('current')">Reset to Auto</button>
   </div>
 
-  <!-- Next Day Controls -->
   <div class="admin-section">
     <h2>Next Day Controls</h2>
-    <button class="admin-btn" onclick="setDay('next', 1)">Day 1</button>
-    <button class="admin-btn" onclick="setDay('next', 2)">Day 2</button>
-    <button class="admin-btn" onclick="setSchedule('next', 'Half-Day')">Half-Day</button>
-    <button class="admin-btn" onclick="setSchedule('next', '2hr Delay')">2 Hour Delay</button>
-    <button class="admin-btn" onclick="setSchedule('next', 'Regular Day')">Regular Day</button>
+    <button class="admin-btn" onclick="setDay('next',1)">Day 1</button>
+    <button class="admin-btn" onclick="setDay('next',2)">Day 2</button>
+    <button class="admin-btn" onclick="setSchedule('next','Half-Day')">Half-Day</button>
+    <button class="admin-btn" onclick="setSchedule('next','2hr Delay')">2 Hour Delay</button>
+    <button class="admin-btn" onclick="setSchedule('next','Regular Day')">Regular Day</button>
     <button class="admin-btn" onclick="resetAuto('next')">Reset to Auto</button>
   </div>
 
-  <!-- Announcement Controls -->
+  <!-- Announcements -->
   <div class="admin-section">
     <h2>Announcements</h2>
     <div class="form-group">
       <label>Message</label>
-      <textarea id="announcementText" rows="3"></textarea>
+      <textarea id="announcementText" rows="3" placeholder="Enter announcement"></textarea>
     </div>
     <div class="form-group">
       <label>Background Color</label>
       <input type="color" id="colorPicker" value="#6a0dad">
-      <input type="text" id="announcementColor" value="#6a0dad">
+      <input type="text" id="announcementColor" value="#6a0dad" placeholder="#6a0dad">
     </div>
     <button class="admin-btn apply-btn" onclick="setAnnouncement()">Apply Announcement</button>
     <button class="admin-btn clear-btn" onclick="clearAnnouncement()">Clear Announcement</button>
@@ -164,7 +191,6 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
     authDomain: "lfcsd-days.firebaseapp.com",
@@ -178,23 +204,25 @@
   const db = firebase.firestore();
 
   // Login
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  document.getElementById('loginForm').addEventListener('submit', async e=>{
     e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
     try {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      const email=document.getElementById('email').value;
+      const password=document.getElementById('password').value;
+      const userCredential = await auth.signInWithEmailAndPassword(email,password);
       const token = await userCredential.user.getIdTokenResult();
-      if (token.claims.admin) {
+      if(token.claims.admin){
         document.getElementById('loginContainer').style.display='none';
         document.getElementById('adminPanel').style.display='block';
         loadAnnouncement();
       } else throw new Error('Not an admin');
-    } catch (err) { document.getElementById('errorMessage').textContent = err.message; auth.signOut();}
+    } catch(err){
+      document.getElementById('errorMessage').textContent=err.message;
+      auth.signOut();
+    }
   });
 
-  // Auth state
-  auth.onAuthStateChanged(async user => {
+  auth.onAuthStateChanged(async user=>{
     if(user){
       const token = await user.getIdTokenResult();
       if(token.claims.admin){
@@ -207,26 +235,26 @@
 
   function logout(){ auth.signOut(); document.getElementById('loginContainer').style.display='block'; document.getElementById('adminPanel').style.display='none'; }
 
-  // Day & Schedule
+  // Settings
   async function updateSettings(updates, collection){
-    await db.collection(collection).doc("current").update({...updates, lastUpdated: firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection(collection).doc('current').update({...updates,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()});
     alert("Updated successfully");
   }
-  function setDay(type, day){ updateSettings({manualDay: day, autoMode:false}, type==='current'?'settings':'nextDaySettings'); }
-  function setSchedule(type, schedule){ updateSettings({schedule:schedule, autoMode:schedule==='Regular Day'}, type==='current'?'settings':'nextDaySettings'); }
-  function resetAuto(type){ updateSettings({manualDay:null,schedule:'Regular Day',autoMode:true}, type==='current'?'settings':'nextDaySettings'); }
+  function setDay(type,day){ updateSettings({manualDay:day,autoMode:false},type==='current'?'settings':'nextDaySettings'); }
+  function setSchedule(type,schedule){ updateSettings({schedule:schedule,autoMode:schedule==='Regular Day'},type==='current'?'settings':'nextDaySettings'); }
+  function resetAuto(type){ updateSettings({manualDay:null,schedule:'Regular Day',autoMode:true},type==='current'?'settings':'nextDaySettings'); }
 
   // Announcements
   async function setAnnouncement(){
     const msg=document.getElementById('announcementText').value.trim();
     const color=document.getElementById('announcementColor').value||'#6a0dad';
     if(!msg){alert('Enter message'); return;}
-    await db.collection("announcements").doc("current").set({message:msg,color:color,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('announcements').doc('current').set({message:msg,color:color,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()});
     updateAnnouncementPreview();
     alert('Announcement set!');
   }
   async function clearAnnouncement(){
-    await db.collection("announcements").doc("current").delete();
+    await db.collection('announcements').doc('current').delete();
     document.getElementById('announcementText').value='';
     document.getElementById('announcementColor').value='#6a0dad';
     updateAnnouncementPreview();
@@ -248,32 +276,28 @@
   }
 
   // Push Notifications
-  const publicVapidKey = "BDCwJOe_9loznu0yeRBZoYhxg_LvzR5TA6ekWhQgTS6n9JvmrJWQdgZcSRw1OHswUSmnUV3VSo-FzrQtcCAl_5s";
-
+  const publicVapidKey="BDCwJOe_9loznu0yeRBZoYhxg_LvzR5TA6ekWhQgTS6n9JvmrJWQdgZcSRw1OHswUSmnUV3VSo-FzrQtcCAl_5s";
   async function sendPush(){
     const title=document.getElementById('notifTitle').value;
     const message=document.getElementById('notifMessage').value;
     const icon=document.getElementById('notifIcon').value||'';
     const url=document.getElementById('notifURL').value||'';
     if(!title||!message){alert('Enter title & message'); return;}
-
-    const snapshot = await db.collection('push_subscriptions').get();
-    const subscriptions = snapshot.docs.map(d=>d.data());
-
-    for(const sub of subscriptions){
+    const snapshot=await db.collection('push_subscriptions').get();
+    const subs=snapshot.docs.map(d=>d.data());
+    for(const sub of subs){
       try{
         await fetch(sub.endpoint,{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({title,message,icon,url,keys:sub.keys})
         });
-      }catch(e){console.warn('Failed:', e);}
+      }catch(e){console.warn('Failed',e);}
     }
-    document.getElementById('notifPreview').textContent=`Sent "${title}" to ${subscriptions.length} subscribers`;
-    alert(`Sent notification to ${subscriptions.length} subscribers`);
+    document.getElementById('notifPreview').textContent=`Sent "${title}" to ${subs.length} subscribers`;
+    alert(`Sent notification to ${subs.length} subscribers`);
   }
 
-  // Update previews on typing
   document.getElementById('announcementText').addEventListener('input', updateAnnouncementPreview);
   document.getElementById('announcementColor').addEventListener('input', updateAnnouncementPreview);
 </script>
