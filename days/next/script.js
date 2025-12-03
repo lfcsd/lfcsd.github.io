@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ======================
     // DAY CALCULATION LOGIC
     // ======================
-    const START_DATE = new Date('2025-09-10T00:00:00-05:00'); // Known Day 1 in EST
+    const START_DATE = new Date('2025-10-09T00:00:00-05:00'); // Known Day 1 in EST
 
     function getCurrentESTDate() {
       const now = new Date();
