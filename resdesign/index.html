@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LFCSD Days</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon-lfcsd.png">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase Init -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.firebase = { db, app };
+  </script>
+
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+
+<!-- ✅ NAVBAR -->
+<nav class="navbar">
+  <div class="nav-left">
+    <img src="logo.png" class="nav-logo">
+    <span class="nav-title">LFCSD Days</span>
+  </div>
+
+  <div class="nav-right">
+    <button id="menuBtn" class="nav-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div id="dropdownMenu" class="nav-dropdown">
+      <a href="/">Today's Day</a>
+      <a href="/days/next/">Next Day</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ✅ ANNOUNCEMENT -->
+<div id="announcementBar" class="announcement-bar"></div>
+
+<!-- ✅ MAIN CARD -->
+<main class="card">
+  <img src="logo.png" class="main-logo">
+
+  <div id="specialSchedule"></div>
+  <div id="dayText" class="day-text">Loading...</div>
+  <div id="timeDisplay" class="time-display"></div>
+</main>
+
+<!-- ✅ FOOTER -->
+<footer class="footer">
+  This website is not affiliated with LFCSD
+</footer>
+
+<!-- ✅ MOBILE INSTALL POPUP -->
+<div id="installPopup" class="install-popup hidden">
+  <div class="popup-card">
+    <h2>Get the Web App</h2>
+    <p>The web app is faster, more optimized, and includes notifications.</p>
+
+    <div class="platform-toggle">
+      <button class="platform-btn active" data-platform="ios">iOS</button>
+      <button class="platform-btn" data-platform="android">Android</button>
+    </div>
+
+    <div id="installInstructions" class="install-instructions">
+      Tap the Share icon, then select "Add to Home Screen".
+    </div>
+
+    <button id="dismissInstall" class="dismiss-btn">Dismiss</button>
+  </div>
+</div>
+
+</body>
+</html>
