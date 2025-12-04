@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Firebase Init (keeps your existing config) -->
+  <!-- Firebase Init -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
@@ -29,8 +29,16 @@
     window.firebase = { db, app };
   </script>
 
-  <!-- OneSignal SDK -->
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+  <!-- OneSignal v16 SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "b655dea8-a108-4112-9cbb-f5f6e3c9e012",
+      });
+    });
+  </script>
 
   <script src="script.js" defer></script>
 </head>
@@ -44,7 +52,6 @@
 
   <div class="nav-right">
     <button id="menuBtn" class="nav-menu-btn" aria-expanded="false" aria-controls="dropdownMenu"><i class="fas fa-bars"></i></button>
-
     <div id="dropdownMenu" class="nav-dropdown" role="menu" aria-hidden="true">
       <a href="/" role="menuitem">Today's Day</a>
       <a href="/days/next/" role="menuitem">Next Day</a>
@@ -54,6 +61,7 @@
   </div>
 </nav>
 
+<!-- Announcements -->
 <div id="announcementBar" class="announcement-bar" role="status" aria-live="polite"></div>
 
 <main class="card" role="main">
@@ -94,7 +102,7 @@
 </div>
 
 <script>
-  // Register service worker
+  // Register Service Worker for OneSignal push
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/OneSignalSDKWorker.js').catch(e => console.warn('SW failed:', e));
   }
