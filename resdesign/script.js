@@ -1,38 +1,35 @@
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
   // ======================
   // 0. Firebase check
   // ======================
-  if (!window.firebase) {
+  if (!window.firebase?.db) {
     console.error("Firebase not initialized!");
     document.getElementById('dayText').textContent = "System Error";
     return;
   }
-  const db = firebase.firestore();
+  const db = window.firebase.db;
 
   // ======================
-  // 1. MENU BUTTON
+  // 1. MENU AND REPORT BUTTONS
   // ======================
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
+  const reportBtn = document.getElementById('reportBtn');
 
-  menuBtn.addEventListener('click', function() {
+  menuBtn.addEventListener('click', () => {
     dropdownMenu.classList.toggle('show');
     menuBtn.setAttribute("aria-expanded", dropdownMenu.classList.contains('show'));
   });
 
-  document.addEventListener('click', function(e) {
-    if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+  document.addEventListener('click', (event) => {
+    if (!menuBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
       dropdownMenu.classList.remove('show');
       menuBtn.setAttribute("aria-expanded", false);
     }
   });
 
-  // ======================
-  // 2. REPORT BUTTON
-  // ======================
-  const reportBtn = document.getElementById('reportBtn');
-  reportBtn.addEventListener('click', function() {
-    if (confirm('Are you sure you want to report this day as incorrect? This will notify the site administrator.')) {
+  reportBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to report this day as incorrect?\nThis will notify the site administrator.')) {
       const webhookURL = 'https://discord.com/api/webhooks/1354971848944779284/IfbRlUhpkTNh02jb5nH3oRE_Epdv-lNwJ2mJFntGiDXZKD-fqaVy7kDd2WTMbaXTJNIk';
       const message = {
         content: 'Hey <@957691566271660102>! A user reported the current day may be incorrect!',
@@ -42,14 +39,19 @@ document.addEventListener('DOMContentLoaded', async function() {
           color: 0xff0000
         }]
       };
-      fetch(webhookURL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(message)})
-        .then(res => res.ok ? alert("Report sent!") : Promise.reject("Failed"))
-        .catch(err => { console.error(err); alert("Failed to send report"); });
+
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(message)
+      })
+      .then(res => res.ok ? alert('Report sent successfully!') : Promise.reject('Failed'))
+      .catch(err => { console.error(err); alert('Failed to send report.'); });
     }
   });
 
   // ======================
-  // 3. LIVE CLOCK
+  // 2. LIVE CLOCK (EST)
   // ======================
   function updateESTTime() {
     const options = { timeZone:'America/New_York', weekday:'long', hour:'numeric', minute:'numeric', hour12:true };
@@ -59,40 +61,29 @@ document.addEventListener('DOMContentLoaded', async function() {
   setInterval(updateESTTime, 60000);
 
   // ======================
-  // 4. DAY CALCULATION
+  // 3. DAY CALCULATION
   // ======================
   const START_DATE = new Date('2025-10-09T00:00:00-05:00');
 
   function getCurrentESTDate() {
     const now = new Date();
-    const estStr = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
-    return new Date(estStr);
+    return new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
   }
 
   function calculateCurrentDay() {
     const estNow = getCurrentESTDate();
     const diffTime = estNow - START_DATE;
     const diffDays = Math.floor(diffTime / (1000*60*60*24));
-    return (diffDays % 2) + 1; // Day 1 or 2
-  }
-
-  function getDayText(scheduleData) {
-    const now = getCurrentESTDate();
-    const hour = now.getHours();
-    const day = (scheduleData.autoMode !== false && !scheduleData.manualDay) ? calculateCurrentDay() : scheduleData.manualDay;
-    if (hour >= 15) return `Today was a Day ${day}`;
-    if (hour < 0) return `Today will be a Day ${day}`;
-    return `Today is a Day ${day}`;
+    return (diffDays % 2) + 1;
   }
 
   // ======================
-  // 5. FIRESTORE LISTENERS
+  // 4. FIRESTORE LISTENERS
   // ======================
   const announcementRef = db.collection("announcements").doc("current");
   const settingsRef = db.collection("settings").doc("current");
-  const nextDayRef = db.collection("nextDaySettings").doc("current");
 
-  // Announcement bar
+  // Announcements
   announcementRef.onSnapshot(docSnap => {
     const bar = document.getElementById('announcementBar');
     if (docSnap.exists() && docSnap.data().message) {
@@ -100,32 +91,44 @@ document.addEventListener('DOMContentLoaded', async function() {
       bar.textContent = data.message;
       bar.style.backgroundColor = data.color || "#6a0dad";
       bar.style.display = "block";
-    } else bar.style.display = "none";
+      document.body.classList.add('has-announcement');
+    } else {
+      bar.style.display = "none";
+      document.body.classList.remove('has-announcement');
+    }
   });
 
-  // Day and schedule display
-  function updateDayDisplay(data, targetId='dayText') {
-    const dayTextEl = document.getElementById(targetId);
+  // Day / Schedule
+  settingsRef.onSnapshot(docSnap => {
+    if (!docSnap.exists()) return;
+    const data = docSnap.data();
+    const dayTextEl = document.getElementById('dayText');
     const scheduleEl = document.getElementById('specialSchedule');
-    dayTextEl.textContent = getDayText(data);
 
+    dayTextEl.textContent = '';
     scheduleEl.innerHTML = '';
+
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      dayTextEl.textContent = 'No School';
+      return;
+    }
+
     const badge = document.createElement('span');
     badge.className = 'schedule-badge';
     badge.textContent = data.schedule || 'Regular Day';
     scheduleEl.appendChild(badge);
-  }
 
-  settingsRef.onSnapshot(docSnap => {
-    if (docSnap.exists()) updateDayDisplay(docSnap.data());
-  });
-
-  nextDayRef.onSnapshot(docSnap => {
-    if (docSnap.exists()) updateDayDisplay(docSnap.data(), 'dayText');
+    if (data.autoMode !== false && !data.manualDay) {
+      dayTextEl.textContent = `Day ${calculateCurrentDay()}`;
+    } else {
+      dayTextEl.textContent = `Day ${data.manualDay}`;
+    }
   });
 
   // ======================
-  // 6. PWA INSTALL POPUP
+  // 5. PWA INSTALL POPUP
   // ======================
   let deferredPrompt;
   const installPopup = document.getElementById('installPopup');
@@ -143,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   installBtn.addEventListener('click', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
+      await deferredPrompt.userChoice;
       deferredPrompt = null;
       installPopup.classList.add('hidden');
     }
@@ -163,12 +166,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   });
 
   // ======================
-  // 7. PUSH NOTIFICATIONS via OneSignal
+  // 6. PUSH NOTIFICATIONS (OneSignal)
   // ======================
   const notifBtn = document.getElementById('enableNotifBtn');
-  if (notifBtn) {
+  if (notifBtn && window.OneSignal) {
     notifBtn.addEventListener('click', () => {
-      if (!window.OneSignal) return alert("Notifications not supported.");
       OneSignal.push(function() {
         OneSignal.showNativePrompt().then(() => {
           alert("Notifications enabled!");
