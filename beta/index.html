@@ -68,19 +68,24 @@
   </div>
 </nav>
 
-<!-- Announcements -->
-<div id="announcementBar" class="announcement-bar"></div>
+<!-- Announcement Popup -->
+<div id="installPopup" class="install-popup hidden">
+  <div class="popup-card announcement-card">
 
-<main class="card">
-  <img src="/logo.png" class="main-logo" alt="logo">
-  <div id="specialSchedule"></div>
-  <div id="dayText" class="day-text">Loading...</div>
-  <div id="timeDisplay" class="time-display"></div>
+    <div class="announcement-header">
+      <i class="fas fa-triangle-exclamation warning-icon"></i>
+      <h2 id="popupTitle">Announcement</h2>
+    </div>
 
-  <div class="controls-row">
-    <button id="reportBtn" class="pill report-pill">Report</button>
+    <p class="muted" id="popupDescription"></p>
+
+    <div class="popup-actions">
+      <button id="dismissInstall" class="dismiss">Close</button>
+    </div>
+
   </div>
-</main>
+</div>
+
 
 <footer class="footer">This website is not affiliated with LFCSD</footer>
 
