@@ -1,25 +1,12 @@
+import { collection, doc, onSnapshot, setDoc, deleteDoc, updateDoc, serverTimestamp, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
 document.addEventListener('DOMContentLoaded', async function() {
-  // ======================
-  // 0. Firebase Initialization
-  // ======================
-  if (!window.firebase) {
-    console.error("Firebase not loaded!");
+  if (!window.firebase?.db) {
+    console.error("Firebase not initialized!");
     document.getElementById('dayText').textContent = "System Error";
     return;
   }
-
-  // 🔹 Your Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
-      authDomain: "lfcsd-days.firebaseapp.com",
-      projectId: "lfcsd-days",
-      storageBucket: "lfcsd-days.appspot.com",
-      messagingSenderId: "520576481150",
-      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
-    };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore(); // ✅ Firestore properly initialized
+  const db = window.firebase.db;
 
   // ======================
   // 1. MENU BUTTON
@@ -27,12 +14,12 @@ document.addEventListener('DOMContentLoaded', async function() {
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
 
-  menuBtn.addEventListener('click', function() {
+  menuBtn.addEventListener('click', () => {
     dropdownMenu.classList.toggle('show');
     menuBtn.setAttribute("aria-expanded", dropdownMenu.classList.contains('show'));
   });
 
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', (e) => {
     if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
       dropdownMenu.classList.remove('show');
       menuBtn.setAttribute("aria-expanded", false);
@@ -43,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // 2. REPORT BUTTON
   // ======================
   const reportBtn = document.getElementById('reportBtn');
-  reportBtn.addEventListener('click', function() {
+  reportBtn.addEventListener('click', async function() {
     if (confirm('Are you sure you want to report this day as incorrect? This will notify the site administrator.')) {
       const webhookURL = 'https://discord.com/api/webhooks/1354971848944779284/IfbRlUhpkTNh02jb5nH3oRE_Epdv-lNwJ2mJFntGiDXZKD-fqaVy7kDd2WTMbaXTJNIk';
       const message = {
@@ -54,13 +41,11 @@ document.addEventListener('DOMContentLoaded', async function() {
           color: 0xff0000
         }]
       };
-      fetch(webhookURL, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(message)
-      })
-      .then(res => res.ok ? alert("Report sent!") : Promise.reject("Failed"))
-      .catch(err => { console.error(err); alert("Failed to send report"); });
+      try {
+        const res = await fetch(webhookURL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(message)});
+        if(res.ok) alert("Report sent!");
+        else throw new Error("Failed to send report");
+      } catch(err) { console.error(err); alert("Failed to send report"); }
     }
   });
 
@@ -101,6 +86,23 @@ document.addEventListener('DOMContentLoaded', async function() {
     return `Today is a Day ${day}`;
   }
 
+  // ======================
+  // 5. FIRESTORE LISTENERS (modular)
+  // ======================
+  const announcementDoc = doc(db, "announcements", "current");
+  const settingsDoc = doc(db, "settings", "current");
+  const nextDayDoc = doc(db, "nextDaySettings", "current");
+
+  onSnapshot(announcementDoc, (docSnap) => {
+    const bar = document.getElementById('announcementBar');
+    if(docSnap.exists() && docSnap.data().message){
+      const data = docSnap.data();
+      bar.textContent = data.message;
+      bar.style.backgroundColor = data.color || "#6a0dad";
+      bar.style.display = "block";
+    } else bar.style.display = "none";
+  });
+
   function updateDayDisplay(data, targetId='dayText') {
     const dayTextEl = document.getElementById(targetId);
     const scheduleEl = document.getElementById('specialSchedule');
@@ -113,33 +115,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     scheduleEl.appendChild(badge);
   }
 
-  // ======================
-  // 5. FIRESTORE LISTENERS
-  // ======================
-  const announcementRef = db.collection("announcements").doc("current");
-  const settingsRef = db.collection("settings").doc("current");
-  const nextDayRef = db.collection("nextDaySettings").doc("current");
-
-  // Announcements bar
-  announcementRef.onSnapshot(docSnap => {
-    const bar = document.getElementById('announcementBar');
-    if (docSnap.exists() && docSnap.data().message) {
-      const data = docSnap.data();
-      bar.textContent = data.message;
-      bar.style.backgroundColor = data.color || "#6a0dad";
-      bar.style.display = "block";
-    } else bar.style.display = "none";
-  });
-
-  // Current day
-  settingsRef.onSnapshot(docSnap => {
-    if (docSnap.exists()) updateDayDisplay(docSnap.data());
-  });
-
-  // Next day
-  nextDayRef.onSnapshot(docSnap => {
-    if (docSnap.exists()) updateDayDisplay(docSnap.data(), 'dayText');
-  });
+  onSnapshot(settingsDoc, (docSnap) => { if(docSnap.exists()) updateDayDisplay(docSnap.data()); });
+  onSnapshot(nextDayDoc, (docSnap) => { if(docSnap.exists()) updateDayDisplay(docSnap.data(), 'dayText'); });
 
   // ======================
   // 6. PWA INSTALL POPUP
@@ -152,15 +129,13 @@ document.addEventListener('DOMContentLoaded', async function() {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
-      installPopup.classList.remove('hidden');
-    }
+    if (!window.matchMedia('(display-mode: standalone)').matches) installPopup.classList.remove('hidden');
   });
 
   installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
+    if(deferredPrompt){
       deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
+      await deferredPrompt.userChoice;
       deferredPrompt = null;
       installPopup.classList.add('hidden');
     }
@@ -180,16 +155,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   });
 
   // ======================
-  // 7. PUSH NOTIFICATIONS via OneSignal v16
+  // 7. OneSignal Notifications
   // ======================
   const notifBtn = document.getElementById('enableNotifBtn');
-  if (notifBtn) {
+  if(notifBtn){
     notifBtn.addEventListener('click', () => {
-      if (!window.OneSignal) return alert("Notifications not supported.");
-      OneSignal.push(function() {
-        OneSignal.showNativePrompt().then(() => {
-          alert("Notifications enabled!");
-        });
+      if(!window.OneSignal) return alert("Notifications not supported.");
+      OneSignalDeferred.push(function(OneSignal){
+        OneSignal.showNativePrompt().then(() => alert("Notifications enabled!"));
       });
     });
   }
