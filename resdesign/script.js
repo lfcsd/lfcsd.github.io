@@ -1,13 +1,25 @@
 document.addEventListener('DOMContentLoaded', async function() {
   // ======================
-  // 0. Firebase check
+  // 0. Firebase Initialization
   // ======================
-  if (!window.firebase?.db) {
-    console.error("Firebase not initialized!");
+  if (!window.firebase) {
+    console.error("Firebase not loaded!");
     document.getElementById('dayText').textContent = "System Error";
     return;
   }
-  const { db } = window.firebase;
+
+  // 🔹 Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore(); // ✅ Firestore properly initialized
 
   // ======================
   // 1. MENU BUTTON
@@ -42,9 +54,13 @@ document.addEventListener('DOMContentLoaded', async function() {
           color: 0xff0000
         }]
       };
-      fetch(webhookURL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(message)})
-        .then(res => res.ok ? alert("Report sent!") : Promise.reject("Failed"))
-        .catch(err => { console.error(err); alert("Failed to send report"); });
+      fetch(webhookURL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(message)
+      })
+      .then(res => res.ok ? alert("Report sent!") : Promise.reject("Failed"))
+      .catch(err => { console.error(err); alert("Failed to send report"); });
     }
   });
 
@@ -85,23 +101,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     return `Today is a Day ${day}`;
   }
 
-  // ======================
-  // 5. FIRESTORE LISTENERS
-  // ======================
-  const announcementRef = db.collection("announcements").doc("current");
-  const settingsRef = db.collection("settings").doc("current");
-  const nextDayRef = db.collection("nextDaySettings").doc("current");
-
-  announcementRef.onSnapshot(docSnap => {
-    const bar = document.getElementById('announcementBar');
-    if (docSnap.exists() && docSnap.data().message) {
-      const data = docSnap.data();
-      bar.textContent = data.message;
-      bar.style.backgroundColor = data.color || "#6a0dad";
-      bar.style.display = "block";
-    } else bar.style.display = "none";
-  });
-
   function updateDayDisplay(data, targetId='dayText') {
     const dayTextEl = document.getElementById(targetId);
     const scheduleEl = document.getElementById('specialSchedule');
@@ -114,10 +113,30 @@ document.addEventListener('DOMContentLoaded', async function() {
     scheduleEl.appendChild(badge);
   }
 
+  // ======================
+  // 5. FIRESTORE LISTENERS
+  // ======================
+  const announcementRef = db.collection("announcements").doc("current");
+  const settingsRef = db.collection("settings").doc("current");
+  const nextDayRef = db.collection("nextDaySettings").doc("current");
+
+  // Announcements bar
+  announcementRef.onSnapshot(docSnap => {
+    const bar = document.getElementById('announcementBar');
+    if (docSnap.exists() && docSnap.data().message) {
+      const data = docSnap.data();
+      bar.textContent = data.message;
+      bar.style.backgroundColor = data.color || "#6a0dad";
+      bar.style.display = "block";
+    } else bar.style.display = "none";
+  });
+
+  // Current day
   settingsRef.onSnapshot(docSnap => {
     if (docSnap.exists()) updateDayDisplay(docSnap.data());
   });
 
+  // Next day
   nextDayRef.onSnapshot(docSnap => {
     if (docSnap.exists()) updateDayDisplay(docSnap.data(), 'dayText');
   });
@@ -165,12 +184,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   // ======================
   const notifBtn = document.getElementById('enableNotifBtn');
   if (notifBtn) {
-    notifBtn.addEventListener('click', async () => {
-      if (!window.OneSignalDeferred) return alert("Notifications not supported.");
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.showNativePrompt();
-        alert("Notifications enabled!");
+    notifBtn.addEventListener('click', () => {
+      if (!window.OneSignal) return alert("Notifications not supported.");
+      OneSignal.push(function() {
+        OneSignal.showNativePrompt().then(() => {
+          alert("Notifications enabled!");
+        });
       });
     });
   }
+
 });
