@@ -15,24 +15,39 @@ body {
   background: linear-gradient(135deg,#6a0dad,#8a2be2);
   color:white; min-height:100vh;
 }
-.login-container,.admin-panel {
-  max-width:500px; margin:50px auto; background: rgba(0,0,0,0.7);
-  padding:30px; border-radius:10px; text-align:center;
+
+.login-container, .admin-panel {
+  max-width:600px; margin:50px auto; background: rgba(0,0,0,0.7);
+  padding:30px; border-radius:15px; text-align:center;
 }
+
 .form-group { margin-bottom:15px; text-align:left; }
 .form-group label { display:block; margin-bottom:5px; font-weight:bold; }
-.form-group input,.form-group textarea { width:100%; padding:10px; border-radius:5px; border:none; font-family:'Lexend',sans-serif; }
-.login-btn,.admin-btn,.apply-btn,.clear-btn,.logout-btn { padding:10px 15px; border:none; border-radius:5px; cursor:pointer; font-family:'Lexend',sans-serif; transition:background 0.3s; }
+.form-group input, .form-group textarea { width:100%; padding:10px; border-radius:5px; border:none; font-family:'Lexend',sans-serif; }
+
+button { padding:10px 15px; border:none; border-radius:5px; cursor:pointer; font-family:'Lexend',sans-serif; transition: background 0.3s; }
+
 .login-btn { width:100%; background:#8a2be2; color:white; }
 .login-btn:hover { background:#6a0dad; }
+
 .admin-btn { background:#8a2be2; color:white; margin:5px; }
 .admin-btn:hover { background:#6a0dad; }
+
 .apply-btn { background-color:#4CAF50; }
 .clear-btn { background-color:#f44336; }
 .logout-btn { background:#ff6b6b; color:white; display:block; margin:20px auto; }
-.announcement-preview { margin-top:20px; padding:15px; border-radius:5px; text-align:center; background-color:#6a0dad; }
-.admin-buttons { display:flex; flex-wrap:wrap; justify-content:center; }
-@media(max-width:768px){ .admin-buttons{ flex-direction:column; } }
+
+.admin-buttons { display:flex; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+
+.announcement-section, .notification-section {
+  background: rgba(255,255,255,0.05); padding:20px; border-radius:10px; margin-top:25px; text-align:left;
+}
+
+.announcement-section h2, .notification-section h2 { display:flex; align-items:center; gap:10px; font-size:1.3em; margin-bottom:15px; }
+
+.announcement-preview { margin-top:10px; padding:15px; border-radius:5px; text-align:center; background-color:#6a0dad; color:white; font-weight:bold; }
+
+@media(max-width:768px) { .admin-buttons { flex-direction:column; } }
 </style>
 </head>
 <body>
@@ -50,6 +65,7 @@ body {
 
 <!-- Admin Panel -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
+
 <h2>Today's Day Controls</h2>
 <div class="admin-buttons">
 <button class="admin-btn" onclick="setDay('current',1)">Day 1</button>
@@ -70,7 +86,9 @@ body {
 <button class="admin-btn" onclick="resetAuto('next')">Reset Auto</button>
 </div>
 
-<h2>Announcements</h2>
+<!-- Announcement Section -->
+<div class="announcement-section">
+<h2><i class="fas fa-bullhorn"></i> Announcements</h2>
 <div class="form-group">
 <label>Message:</label>
 <textarea id="announcementText" rows="3" placeholder="Enter announcement text..."></textarea>
@@ -84,14 +102,18 @@ body {
 <button class="admin-btn clear-btn" id="clearAnnouncement">Clear Announcement</button>
 </div>
 <div class="announcement-preview" id="announcementPreview">Your announcement will appear here</div>
+</div>
 
-<h2>Notifications</h2>
+<!-- Notification Section -->
+<div class="notification-section">
+<h2><i class="fas fa-bell"></i> Notifications</h2>
 <div class="form-group">
 <label>Notification Message:</label>
 <textarea id="notificationText" rows="2" placeholder="Enter notification message..."></textarea>
 </div>
 <div class="admin-buttons">
 <button class="admin-btn apply-btn" id="sendNotificationBtn"><i class="fas fa-bell"></i> Send Notification</button>
+</div>
 </div>
 
 <button class="logout-btn" onclick="logout()">Logout</button>
@@ -186,7 +208,6 @@ async function loadAnnouncement(){
     updatePreview();
   }
 }
-
 function updatePreview(){
   const text = document.getElementById('announcementText').value;
   const color = document.getElementById('announcementColor').value;
@@ -194,7 +215,6 @@ function updatePreview(){
   preview.textContent = text||"Your announcement will appear here";
   preview.style.backgroundColor=color;
 }
-
 document.getElementById('applyAnnouncementBtn').addEventListener('click',async ()=>{
   const message = document.getElementById('announcementText').value.trim();
   const color = document.getElementById('announcementColor').value;
@@ -205,7 +225,6 @@ document.getElementById('applyAnnouncementBtn').addEventListener('click',async (
   updatePreview();
   alert("Announcement updated!");
 });
-
 document.getElementById('clearAnnouncement').addEventListener('click',async ()=>{
   await db.collection("announcements").doc("current").delete();
   document.getElementById('announcementText').value="";
