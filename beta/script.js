@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // Verify Firebase is available
   if (!window.firebase?.db) {
     console.error("Firebase not initialized!");
     document.getElementById('dayText').textContent = "System Error";
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const { db } = window.firebase;
 
   // ======================
-  // MENU & REPORT BUTTONS
+  // 1. MENU AND REPORT BUTTONS
   // ======================
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
@@ -16,23 +17,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
   menuBtn.addEventListener('click', () => {
     dropdownMenu.classList.toggle('show');
+    menuBtn.setAttribute("aria-expanded", dropdownMenu.classList.contains('show'));
   });
 
-  document.addEventListener('click', e => {
-    if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+  document.addEventListener('click', (event) => {
+    if (!menuBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
       dropdownMenu.classList.remove('show');
+      menuBtn.setAttribute("aria-expanded", false);
     }
   });
 
+  reportBtn.textContent = "Incorrect?";
   reportBtn.addEventListener('click', () => {
-    if (!confirm("Report this day?")) return;
-    const webhookURL = 'https://discord.com/api/webhooks/1354971848944779284/IfbRlUhpkTNh02jb5nH3oRE_Epdv-lNwJ2mJFntGiDXZKD-fqaVy7kDd2WTMbaXTJNIk';
-    const message = { content: `A user reported the current day at ${new Date().toLocaleString('en-US', {timeZone:'America/New_York'})}` };
-    fetch(webhookURL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(message) });
+    if (confirm('Are you sure you want to report this day as incorrect?\nThis will notify the site administrator.')) {
+      const webhookURL = 'https://discord.com/api/webhooks/1354971848944779284/IfbRlUhpkTNh02jb5nH3oRE_Epdv-lNwJ2mJFntGiDXZKD-fqaVy7kDd2WTMbaXTJNIk';
+      const message = {
+        content: 'Hey <@957691566271660102>! A user reported the current day may be incorrect!',
+        embeds: [{
+          title: 'Day Report',
+          description: `Page: Current Day\nReported at: ${new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})} EST`,
+          color: 0xff0000
+        }]
+      };
+
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(message)
+      })
+      .then(res => res.ok ? alert('Report sent successfully!') : Promise.reject('Failed'))
+      .catch(err => { console.error(err); alert('Failed to send report.'); });
+    }
   });
 
   // ======================
-  // LIVE CLOCK (EST)
+  // 2. LIVE CLOCK (EST)
   // ======================
   function updateESTTime() {
     const options = { timeZone:'America/New_York', weekday:'long', hour:'numeric', minute:'numeric', hour12:true };
@@ -42,70 +61,112 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(updateESTTime, 60000);
 
   // ======================
-  // DAY CALCULATION
+  // 3. DAY CALCULATION
   // ======================
   const START_DATE = new Date('2025-10-09T00:00:00-05:00');
-  function getCurrentESTDate() { return new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'})); }
+
+  function getCurrentESTDate() {
+    const now = new Date();
+    return new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  }
+
   function calculateCurrentDay() {
-    const diffTime = getCurrentESTDate() - START_DATE;
-    return (Math.floor(diffTime / (1000*60*60*24)) % 2) + 1;
+    const estNow = getCurrentESTDate();
+    const diffTime = estNow - START_DATE;
+    const diffDays = Math.floor(diffTime / (1000*60*60*24));
+    return (diffDays % 2) + 1;
+  }
+
+  function calculateNextDay() {
+    return calculateCurrentDay() === 1 ? 2 : 1;
   }
 
   // ======================
-  // FIRESTORE ANNOUNCEMENT MODAL
+  // 4. NEXT DAY BUTTON
   // ======================
+  const controlsRow = document.querySelector('.controls-row');
+  const nextDayBtn = document.createElement('button');
+  nextDayBtn.className = 'pill next-day-pill';
+  nextDayBtn.textContent = 'Next Day';
+  controlsRow.insertBefore(nextDayBtn, reportBtn);
+
+  const nextDayText = document.createElement('div');
+  nextDayText.id = 'nextDayText';
+  controlsRow.appendChild(nextDayText);
+
+  nextDayBtn.addEventListener('click', () => {
+    nextDayText.textContent = `Tomorrow will be a Day ${calculateNextDay()}`;
+  });
+
+  // ======================
+  // 5. FIRESTORE ANNOUNCEMENT MODAL
+  // ======================
+  const announcementPopup = document.getElementById('announcementPopup');
+  const popupTitle = document.getElementById('popupTitle');
+  const popupDescription = document.getElementById('popupDescription');
+  const dismissAnnouncement = document.getElementById('dismissAnnouncement');
+
   import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
     .then(({ onSnapshot, doc }) => {
-      const popup = document.getElementById('announcementPopup');
-      const popupTitle = document.getElementById('popupTitle');
-      const popupDesc = document.getElementById('popupDescription');
-      const popupClose = document.getElementById('dismissAnnouncement');
+      const announcementRef = doc(db, "announcements", "current");
 
-      popupClose.addEventListener('click', () => popup.classList.add('hidden'));
-
-      onSnapshot(doc(db, "announcements", "current"), snap => {
-        if (!snap.exists()) {
-          popup.classList.add('hidden');
-          return;
-        }
-        const data = snap.data();
-        if (data.popupEnabled) {
-          popupTitle.textContent = data.popupTitle || "Announcement";
-          popupDesc.textContent = data.popupDescription || "";
-          popup.classList.remove('hidden');
+      onSnapshot(announcementRef, (docSnapshot) => {
+        if (docSnapshot.exists() && docSnapshot.data().message) {
+          const data = docSnapshot.data();
+          popupDescription.textContent = data.message;
+          popupTitle.style.backgroundColor = data.color || '#6a0dad';
+          announcementPopup.classList.remove('hidden');
         } else {
-          popup.classList.add('hidden');
+          announcementPopup.classList.add('hidden');
         }
       });
     })
-    .catch(e => console.error("Firestore error:", e));
+    .catch(error => console.error("Failed to load Firestore announcements:", error));
+
+  dismissAnnouncement.addEventListener('click', () => {
+    announcementPopup.classList.add('hidden');
+  });
 
   // ======================
-  // DAY/SCHEDULE DISPLAY
+  // 6. DAY DISPLAY LISTENER
   // ======================
   import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
     .then(({ onSnapshot, doc }) => {
-      onSnapshot(doc(db, "settings", "current"), snap => {
-        const data = snap.data() || { manualDay:null, schedule:"Regular Day", autoMode:true };
-        const dayEl = document.getElementById('dayText');
-        const schedEl = document.getElementById('specialSchedule');
-        dayEl.textContent = '';
-        schedEl.innerHTML = '';
+      const settingsRef = doc(db, "settings", "current");
 
-        const dayOfWeek = new Date().getDay();
+      onSnapshot(settingsRef, (docSnapshot) => {
+        const data = docSnapshot.data() || { manualDay:null, schedule:"Regular Day", autoMode:true };
+        updateDayDisplay(data);
+      });
+
+      function updateDayDisplay(data) {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const dayTextElement = document.getElementById('dayText');
+        const specialScheduleElement = document.getElementById('specialSchedule');
+
+        dayTextElement.textContent = '';
+        specialScheduleElement.innerHTML = '';
+
         if (dayOfWeek === 0 || dayOfWeek === 6) {
-          dayEl.textContent = "No School";
+          dayTextElement.textContent = 'No School';
           return;
         }
 
         const badge = document.createElement('span');
         badge.className = 'schedule-badge';
-        badge.textContent = data.schedule || "Regular Day";
-        schedEl.appendChild(badge);
+        badge.textContent = data.schedule || 'Regular Day';
+        specialScheduleElement.appendChild(badge);
 
-        if (data.autoMode && !data.manualDay) dayEl.textContent = `Day ${calculateCurrentDay()}`;
-        else dayEl.textContent = `Day ${data.manualDay}`;
-      });
+        if (data.autoMode !== false && !data.manualDay) {
+          dayTextElement.textContent = `Day ${calculateCurrentDay()}`;
+        } else {
+          dayTextElement.textContent = `Day ${data.manualDay}`;
+        }
+      }
     })
-    .catch(e => console.error(e));
+    .catch(error => {
+      console.error("Failed to load Firestore settings:", error);
+      document.getElementById('dayText').textContent = "Connection Error";
+    });
 });
