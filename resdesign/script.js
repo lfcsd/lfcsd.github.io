@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('dayText').textContent = "System Error";
     return;
   }
-  const db = window.firebase.db;
+  const db = window.firebase;
 
   // ======================
   // 1. MENU AND REPORT BUTTONS
