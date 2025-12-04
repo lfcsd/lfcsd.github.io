@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Firebase SDK v9 (modular version) - ONLY INITIALIZATION -->
+  <!-- Firebase SDK v9 (modular version) -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
@@ -26,12 +26,11 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     window.firebase = { db, app, firestore: { getFirestore } };
     console.log("Firebase initialized successfully");
   </script>
 
-  <!-- OneSignal v16 SDK -->
+  <!-- OneSignal SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -50,7 +49,6 @@
     <img src="/logo.png" alt="LFCSD Logo" class="nav-logo">
     <span class="nav-title">LFCSD Days</span>
   </div>
-
   <div class="nav-right">
     <button id="menuBtn" class="nav-menu-btn"><i class="fas fa-bars"></i></button>
     <div id="dropdownMenu" class="nav-dropdown">
@@ -62,21 +60,17 @@
   </div>
 </nav>
 
-<!-- ANNOUNCEMENT POPUP (Firestore-driven) -->
-<div id="announcementPopup" class="install-popup hidden">
+<!-- ANNOUNCEMENT MODAL (Firestore-driven) -->
+<div id="announcementPopup" class="install-popup hidden" role="dialog" aria-modal="true" aria-label="Announcement">
   <div class="popup-card announcement-card">
-
     <div class="announcement-header">
       <i class="fas fa-triangle-exclamation warning-icon" style="color:white;font-size:1.5rem;"></i>
       <h2 id="popupTitle">Announcement</h2>
     </div>
-
     <p class="muted" id="popupDescription"></p>
-
     <div class="popup-actions">
       <button id="dismissAnnouncement" class="dismiss">Close</button>
     </div>
-
   </div>
 </div>
 
