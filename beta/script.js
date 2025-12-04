@@ -82,36 +82,36 @@ document.addEventListener('DOMContentLoaded', function() {
   import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
     .then(({ onSnapshot, doc }) => {
 
-      // ======================
-      // POPUP ANNOUNCEMENT LISTENER (REPLACES BANNER)
-      // ======================
-      const popup = document.getElementById('installPopup');
-      const popupTitle = popup.querySelector('h2');
-      const popupDesc = popup.querySelector('.muted');
-      const popupCloseBtn = document.getElementById('dismissInstall');
+// ======================
+// POPUP ANNOUNCEMENT LISTENER (TITLE + DESCRIPTION + ICON)
+// ======================
+const popup = document.getElementById('installPopup');
+const popupTitle = document.getElementById('popupTitle');
+const popupDesc = document.getElementById('popupDescription');
+const popupCloseBtn = document.getElementById('dismissInstall');
 
-      popupCloseBtn.addEventListener('click', () => {
-        popup.classList.add('hidden');
-      });
+popupCloseBtn.addEventListener('click', () => {
+  popup.classList.add('hidden');
+});
 
-      onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
-        if (!docSnapshot.exists()) {
-          popup.classList.add('hidden');
-          return;
-        }
+onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
+  if (!docSnapshot.exists()) {
+    popup.classList.add('hidden');
+    return;
+  }
 
-        const data = docSnapshot.data();
+  const data = docSnapshot.data();
 
-        if (data.popupEnabled === true) {
-          popupTitle.textContent = data.popupTitle || "Announcement";
-          popupDesc.textContent = data.popupDescription || "";
-          popupCloseBtn.textContent = data.popupCloseText || "Close";
+  if (data.popupEnabled === true) {
+    popupTitle.textContent = data.popupTitle || "Announcement";
+    popupDesc.textContent = data.popupDescription || "";
 
-          popup.classList.remove('hidden');
-        } else {
-          popup.classList.add('hidden');
-        }
-      });
+    popup.classList.remove('hidden');
+  } else {
+    popup.classList.add('hidden');
+  }
+});
+
 
       // ======================
       // DAY / SCHEDULE LISTENER (UNCHANGED)
