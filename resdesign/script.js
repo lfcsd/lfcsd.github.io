@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('dayText').textContent = "System Error";
     return;
   }
-  const db = window.firebase.db;
+  const db = window.firebase;
 
   // ======================
   // 1. MENU AND REPORT BUTTONS
@@ -77,90 +77,76 @@ document.addEventListener('DOMContentLoaded', function() {
     return (diffDays % 2) + 1;
   }
 
-  // ======================
+   // ======================
   // 4. FIRESTORE LISTENERS
   // ======================
-  const announcementRef = db.collection("announcements").doc("current");
-  const settingsRef = db.collection("settings").doc("current");
+  import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
+    .then(({ onSnapshot, doc }) => {
+      const announcementBar = document.getElementById('announcementBar');
+      const container = document.querySelector('.container');
 
-  announcementRef.onSnapshot(docSnap => {
-    const bar = document.getElementById('announcementBar');
-    if (docSnap.exists() && docSnap.data().message) {
-      const data = docSnap.data();
-      bar.textContent = data.message;
-      bar.style.backgroundColor = data.color || "#6a0dad";
-      bar.style.display = "block";
-      document.body.classList.add('has-announcement');
-    } else {
-      bar.style.display = "none";
-      document.body.classList.remove('has-announcement');
-    }
-  });
+      onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
+  const announcementBar = document.getElementById('announcementBar');
+  
+  if (docSnapshot.exists() && docSnapshot.data().message) {
+    const data = docSnapshot.data();
+    announcementBar.textContent = data.message;
+    announcementBar.style.backgroundColor = data.color || '#6a0dad';
+    announcementBar.style.display = 'block';
+    
+    // Add class to body when announcement exists
+    document.body.classList.add('has-announcement');
+  } else {
+    announcementBar.style.display = 'none';
+    document.body.classList.remove('has-announcement');
+  }
+}, (error) => {
+  console.error("Announcement error:", error);
+  document.getElementById('announcementBar').style.display = 'none';
+  document.body.classList.remove('has-announcement');
+});
+      // DAY/SCHEDULE LISTENER
+      onSnapshot(doc(db, "settings", "current"), (docSnapshot) => {
+        const data = docSnapshot.data() || {
+          manualDay: null,
+          schedule: "Regular Day",
+          autoMode: true
+        };
+        updateDayDisplay(data);
+      });
 
-  settingsRef.onSnapshot(docSnap => {
-    if (!docSnap.exists()) return;
-    const data = docSnap.data();
-    const dayTextEl = document.getElementById('dayText');
-    const scheduleEl = document.getElementById('specialSchedule');
+      function updateDayDisplay(data) {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const dayTextElement = document.getElementById('dayText');
+        const specialScheduleElement = document.getElementById('specialSchedule');
 
-    dayTextEl.textContent = '';
-    scheduleEl.innerHTML = '';
+        // Clear previous state
+        dayTextElement.textContent = '';
+        specialScheduleElement.innerHTML = '';
 
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      dayTextEl.textContent = 'No School';
-      return;
-    }
+        // Weekend handling
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          dayTextElement.textContent = 'No School';
+          return;
+        }
 
-    const badge = document.createElement('span');
-    badge.className = 'schedule-badge';
-    badge.textContent = data.schedule || 'Regular Day';
-    scheduleEl.appendChild(badge);
+        // Schedule badge
+        const badge = document.createElement('span');
+        badge.className = 'schedule-badge';
+        badge.textContent = data.schedule || 'Regular Day';
+        specialScheduleElement.appendChild(badge);
 
-    if (data.autoMode !== false && !data.manualDay) {
-      dayTextEl.textContent = `Day ${calculateCurrentDay()}`;
-    } else {
-      dayTextEl.textContent = `Day ${data.manualDay}`;
-    }
-  });
-
-  // ======================
-  // 5. PWA INSTALL POPUP
-  // ======================
-  let deferredPrompt;
-  const installPopup = document.getElementById('installPopup');
-  const installBtn = document.getElementById('installAction');
-  const dismissBtn = document.getElementById('dismissInstall');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
-      installPopup.classList.remove('hidden');
-    }
-  });
-
-  installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installPopup.classList.add('hidden');
-    }
-  });
-
-  dismissBtn.addEventListener('click', () => installPopup.classList.add('hidden'));
-
-  document.querySelectorAll('.platform-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.platform-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const instructions = document.getElementById('installInstructions');
-      instructions.textContent = btn.dataset.platform === 'ios' ?
-        'Tap the Share icon, then select "Add to Home Screen".' :
-        'Tap the menu, then select "Add to Home Screen".';
+        // Day calculation
+        if (data.autoMode !== false && !data.manualDay) {
+          dayTextElement.textContent = `Day ${calculateCurrentDay()}`;
+        } else {
+          dayTextElement.textContent = `Day ${data.manualDay}`;
+        }
+      }
+    })
+    .catch(error => {
+      console.error("Failed to load Firestore:", error);
+      document.getElementById('dayText').textContent = "Connection Error";
     });
-  });
-
 });
