@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>LFCSD Days</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon-lfcsd.png">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.firebase = { db };
+  </script>
+
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <img src="/logo.png" class="nav-logo">
+    <span class="nav-title">LFCSD Days</span>
+  </div>
+</nav>
+
+<main class="card">
+  <img src="/logo.png" class="main-logo">
+  <div id="specialSchedule"></div>
+  <div id="dayText">Loading...</div>
+  <div id="timeDisplay"></div>
+
+  <div class="controls-row">
+    <button id="reportBtn" class="pill report-pill">Incorrect?</button>
+  </div>
+</main>
+
+<footer class="footer">This website is not affiliated with LFCSD</footer>
+
+<div id="sitePopup" class="site-popup hidden">
+  <div class="popup-box">
+    <i class="fas fa-triangle-exclamation warning-icon"></i>
+    <h2 id="popupTitle"></h2>
+    <p id="popupDesc"></p>
+    <button id="popupClose" class="cta"></button>
+  </div>
+</div>
+
+</body>
+</html>
