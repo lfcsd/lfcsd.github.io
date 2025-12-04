@@ -49,15 +49,6 @@
     <img src="/logo.png" alt="LFCSD Logo" class="nav-logo">
     <span class="nav-title">LFCSD Days</span>
   </div>
-  <div class="nav-right">
-    <button id="menuBtn" class="nav-menu-btn"><i class="fas fa-bars"></i></button>
-    <div id="dropdownMenu" class="nav-dropdown">
-      <a href="/">Today's Day</a>
-      <a href="/days/next/">Next Day</a>
-      <hr>
-      <button id="enableNotifBtn" class="dropdown-action">Enable Notifications</button>
-    </div>
-  </div>
 </nav>
 
 <!-- ANNOUNCEMENT MODAL (Firestore-driven) -->
@@ -82,8 +73,10 @@
   <div id="timeDisplay" class="time-display"></div>
 
   <div class="controls-row">
-    <button id="reportBtn" class="pill report-pill">Report</button>
-  </div>
+  <button id="nextDayBtn" class="pill next-day-pill">Tomorrow</button>
+  <button id="reportBtn" class="pill report-pill">Incorrect?</button>
+</div>
+
 </main>
 
 <footer class="footer">This website is not affiliated with LFCSD</footer>
