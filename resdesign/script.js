@@ -1,14 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // ======================
-  // 0. Firebase check
-  // ======================
+  // Verify Firebase is available
   if (!window.firebase?.db) {
     console.error("Firebase not initialized!");
     document.getElementById('dayText').textContent = "System Error";
     return;
   }
-  const db = window.firebase;
 
+  const { db } = window.firebase;
+  
   // ======================
   // 1. MENU AND REPORT BUTTONS
   // ======================
