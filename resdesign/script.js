@@ -80,8 +80,76 @@ document.addEventListener('DOMContentLoaded', function() {
   // ======================
   // 4. FIRESTORE LISTENERS
   // ======================
-  const announcementRef = db.collection("announcements").doc("current");
-  const settingsRef = db.collection("settings").doc("current");
+  import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js')
+    .then(({ onSnapshot, doc }) => {
+      const announcementBar = document.getElementById('announcementBar');
+      const container = document.querySelector('.container');
+
+      onSnapshot(doc(db, "announcements", "current"), (docSnapshot) => {
+  const announcementBar = document.getElementById('announcementBar');
+  
+  if (docSnapshot.exists() && docSnapshot.data().message) {
+    const data = docSnapshot.data();
+    announcementBar.textContent = data.message;
+    announcementBar.style.backgroundColor = data.color || '#6a0dad';
+    announcementBar.style.display = 'block';
+    
+    // Add class to body when announcement exists
+    document.body.classList.add('has-announcement');
+  } else {
+    announcementBar.style.display = 'none';
+    document.body.classList.remove('has-announcement');
+  }
+}, (error) => {
+  console.error("Announcement error:", error);
+  document.getElementById('announcementBar').style.display = 'none';
+  document.body.classList.remove('has-announcement');
+});
+      // DAY/SCHEDULE LISTENER
+      onSnapshot(doc(db, "settings", "current"), (docSnapshot) => {
+        const data = docSnapshot.data() || {
+          manualDay: null,
+          schedule: "Regular Day",
+          autoMode: true
+        };
+        updateDayDisplay(data);
+      });
+
+      function updateDayDisplay(data) {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const dayTextElement = document.getElementById('dayText');
+        const specialScheduleElement = document.getElementById('specialSchedule');
+
+        // Clear previous state
+        dayTextElement.textContent = '';
+        specialScheduleElement.innerHTML = '';
+
+        // Weekend handling
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          dayTextElement.textContent = 'No School';
+          return;
+        }
+
+        // Schedule badge
+        const badge = document.createElement('span');
+        badge.className = 'schedule-badge';
+        badge.textContent = data.schedule || 'Regular Day';
+        specialScheduleElement.appendChild(badge);
+
+        // Day calculation
+        if (data.autoMode !== false && !data.manualDay) {
+          dayTextElement.textContent = `Day ${calculateCurrentDay()}`;
+        } else {
+          dayTextElement.textContent = `Day ${data.manualDay}`;
+        }
+      }
+    })
+    .catch(error => {
+      console.error("Failed to load Firestore:", error);
+      document.getElementById('dayText').textContent = "Connection Error";
+    });
+});
 
   // Announcements
   announcementRef.onSnapshot(docSnap => {
