@@ -302,6 +302,28 @@ html, body {
     font-size: 3.2rem;
   }
 
+/* =========================
+   ANNOUNCEMENT POPUP CARD
+========================= */
+
+.announcement-card {
+  border: 2px solid rgba(255,255,255,0.08);
+}
+
+.announcement-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.warning-icon {
+  font-size: 26px;
+  color: white;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
+}
+
+
   .main-logo {
     width: 110px;
   }
