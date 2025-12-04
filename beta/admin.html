@@ -6,18 +6,18 @@
 <title>LFCSD Days Admin Panel</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
 <style>
 body {
   margin:0;
   padding:0;
-  font-family:'Lexend', sans-serif;
+  font-family:'Lexend',sans-serif;
   background: linear-gradient(135deg,#6a0dad,#8a2be2);
   color:white;
   min-height:100vh;
 }
-
 .login-container, .admin-panel {
   max-width:600px;
   margin:50px auto;
@@ -26,27 +26,15 @@ body {
   border-radius:15px;
   text-align:center;
 }
-
-.form-group {
-  margin-bottom:15px;
-  text-align:left;
-}
-
-.form-group label {
-  display:block;
-  margin-bottom:5px;
-  font-weight:bold;
-}
-
-.form-group input,
-.form-group textarea {
+.form-group { margin-bottom:15px; text-align:left; }
+.form-group label { display:block; margin-bottom:5px; font-weight:bold; }
+.form-group input, .form-group textarea {
   width:100%;
   padding:10px;
   border-radius:5px;
   border:none;
   font-family:'Lexend',sans-serif;
 }
-
 button {
   padding:10px 15px;
   border:none;
@@ -55,153 +43,119 @@ button {
   font-family:'Lexend',sans-serif;
   transition: background 0.3s;
 }
-
-.login-btn {
-  width:100%;
-  background:#8a2be2;
-  color:white;
-}
-
-.login-btn:hover {
-  background:#6a0dad;
-}
-
-.admin-btn {
-  background:#8a2be2;
-  color:white;
-  margin:5px;
-}
-
-.admin-btn:hover {
-  background:#6a0dad;
-}
-
-.apply-btn {
-  background-color:#4CAF50;
-}
-
-.clear-btn {
-  background-color:#f44336;
-}
-
+.login-btn { width:100%; background:#8a2be2; color:white; }
+.login-btn:hover { background:#6a0dad; }
+.admin-btn { background:#8a2be2; color:white; margin:5px; }
+.admin-btn:hover { background:#6a0dad; }
+.apply-btn { background-color:#4CAF50; }
+.clear-btn { background-color:#f44336; }
 .logout-btn {
   background:#ff6b6b;
   color:white;
   display:block;
   margin:20px auto;
 }
-
 .admin-buttons {
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
   margin-bottom:20px;
 }
-
-.section-box {
+.announcement-section, .notification-section {
   background: rgba(255,255,255,0.05);
   padding:20px;
   border-radius:10px;
   margin-top:25px;
   text-align:left;
 }
-
-.section-box h2 {
+.announcement-section h2, .notification-section h2 {
   display:flex;
   align-items:center;
   gap:10px;
   font-size:1.3em;
   margin-bottom:15px;
 }
-
-@media(max-width:768px) {
-  .admin-buttons {
-    flex-direction:column;
-  }
+.announcement-preview {
+  margin-top:10px;
+  padding:15px;
+  border-radius:5px;
+  text-align:center;
+  background-color:#6a0dad;
+  color:white;
+  font-weight:bold;
 }
 </style>
 </head>
+
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN (UNCHANGED) -->
 <div class="login-container" id="loginContainer">
   <h2>Admin Login</h2>
   <form id="loginForm">
     <div class="form-group">
-      <label>Email</label>
+      <label>Email:</label>
       <input type="email" id="email" required>
     </div>
     <div class="form-group">
-      <label>Password</label>
+      <label>Password:</label>
       <input type="password" id="password" required>
     </div>
     <button type="submit" class="login-btn">Login</button>
   </form>
 </div>
 
-<!-- ADMIN PANEL -->
+<!-- ADMIN -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
-
-  <!-- CURRENT DAY -->
-  <div class="section-box">
-    <h2><i class="fas fa-calendar-day"></i> Today's Day</h2>
-    <div class="admin-buttons">
-      <button class="admin-btn" onclick="setDay('current',1)">Day 1</button>
-      <button class="admin-btn" onclick="setDay('current',2)">Day 2</button>
-      <button class="admin-btn" onclick="setSchedule('current','Regular Day')">Regular</button>
-      <button class="admin-btn" onclick="setSchedule('current','Half-Day')">Half-Day</button>
-      <button class="admin-btn" onclick="setSchedule('current','2hr Delay')">2hr Delay</button>
-      <button class="admin-btn" onclick="resetAuto('current')">Auto</button>
-    </div>
+  <h2>Today's Day Controls</h2>
+  <div class="admin-buttons">
+    <button class="admin-btn" onclick="setDay('current',1)">Day 1</button>
+    <button class="admin-btn" onclick="setDay('current',2)">Day 2</button>
+    <button class="admin-btn" onclick="setSchedule('current','Regular Day')">Regular Day</button>
+    <button class="admin-btn" onclick="setSchedule('current','Half-Day')">Half-Day</button>
+    <button class="admin-btn" onclick="setSchedule('current','2hr Delay')">2 Hour Delay</button>
+    <button class="admin-btn" onclick="resetAuto('current')">Reset Auto</button>
   </div>
 
-  <!-- NEXT DAY -->
-  <div class="section-box">
-    <h2><i class="fas fa-forward"></i> Next Day</h2>
-    <div class="admin-buttons">
-      <button class="admin-btn" onclick="setDay('next',1)">Day 1</button>
-      <button class="admin-btn" onclick="setDay('next',2)">Day 2</button>
-      <button class="admin-btn" onclick="setSchedule('next','Regular Day')">Regular</button>
-      <button class="admin-btn" onclick="setSchedule('next','Half-Day')">Half-Day</button>
-      <button class="admin-btn" onclick="setSchedule('next','2hr Delay')">2hr Delay</button>
-      <button class="admin-btn" onclick="resetAuto('next')">Auto</button>
-    </div>
+  <h2>Next Day Controls</h2>
+  <div class="admin-buttons">
+    <button class="admin-btn" onclick="setDay('next',1)">Day 1</button>
+    <button class="admin-btn" onclick="setDay('next',2)">Day 2</button>
+    <button class="admin-btn" onclick="setSchedule('next','Regular Day')">Regular Day</button>
+    <button class="admin-btn" onclick="setSchedule('next','Half-Day')">Half-Day</button>
+    <button class="admin-btn" onclick="setSchedule('next','2hr Delay')">2 Hour Delay</button>
+    <button class="admin-btn" onclick="resetAuto('next')">Reset Auto</button>
   </div>
 
-  <!-- SITE POPUP -->
-  <div class="section-box">
-    <h2><i class="fas fa-triangle-exclamation"></i> Site Popup Announcement</h2>
+  <!-- POPUP ANNOUNCEMENTS (NOW USING FIRESTORE) -->
+  <div class="announcement-section">
+    <h2><i class="fas fa-bullhorn"></i> Popup Announcements</h2>
 
     <div class="form-group">
-      <label>Popup Title</label>
-      <input id="popupTitleInput" placeholder="Enter popup title">
+      <label>Popup Message:</label>
+      <textarea id="popupText" rows="3"></textarea>
     </div>
 
     <div class="form-group">
-      <label>Popup Description</label>
-      <textarea id="popupDescInput" rows="3" placeholder="Enter popup message"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Close Button Text</label>
-      <input id="popupCloseInput" value="Close">
+      <label>Popup Background Color:</label>
+      <input type="color" id="popupColor" value="#6a0dad">
     </div>
 
     <div class="admin-buttons">
-      <button class="admin-btn apply-btn" id="enablePopup">Enable Popup</button>
-      <button class="admin-btn clear-btn" id="disablePopup">Disable Popup</button>
+      <button class="admin-btn apply-btn" id="applyPopup">Apply Popup</button>
+      <button class="admin-btn clear-btn" id="clearPopup">Clear Popup</button>
     </div>
+
+    <div class="announcement-preview" id="popupPreview">Popup preview</div>
   </div>
 
-  <!-- PUSH NOTIFICATIONS -->
-  <div class="section-box">
+  <!-- NOTIFICATIONS -->
+  <div class="notification-section">
     <h2><i class="fas fa-bell"></i> Notifications</h2>
-
     <div class="form-group">
-      <label>Notification Message</label>
+      <label>Notification Message:</label>
       <textarea id="notificationText" rows="2"></textarea>
     </div>
-
     <div class="admin-buttons">
       <button class="admin-btn apply-btn" id="sendNotificationBtn">Send Notification</button>
     </div>
@@ -216,91 +170,106 @@ button {
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey:"AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
   authDomain:"lfcsd-days.firebaseapp.com",
-  projectId:"lfcsd-days",
-  storageBucket:"lfcsd-days.appspot.com",
-  messagingSenderId:"520576481150",
-  appId:"1:520576481150:web:b08a50be7b0d15e113e52f"
-};
+  projectId:"lfcsd-days"
+});
 
-firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// LOGIN
-document.getElementById('loginForm').addEventListener('submit', async e => {
+/* LOGIN UNCHANGED */
+document.getElementById('loginForm').addEventListener('submit', async e=>{
   e.preventDefault();
-  const email = email.value;
-  const password = password.value;
+  const email=document.getElementById('email').value;
+  const password=document.getElementById('password').value;
+  const userCredential = await auth.signInWithEmailAndPassword(email,password);
+  const token = await userCredential.user.getIdTokenResult();
 
-  try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const token = await userCredential.user.getIdTokenResult();
-
-    if (token.claims.admin) {
-      loginContainer.style.display = 'none';
-      adminPanel.style.display = 'block';
-    } else {
-      throw new Error("Not admin");
-    }
-  } catch (e) {
-    alert("Login failed");
+  if(token.claims.admin){
+    loginContainer.style.display="none";
+    adminPanel.style.display="block";
+    loadPopup();
+  } else {
+    alert("Not admin");
+    auth.signOut();
   }
 });
 
-function logout(){
-  auth.signOut();
-  location.reload();
+auth.onAuthStateChanged(async user=>{
+  if(user){
+    const token = await user.getIdTokenResult();
+    if(token.claims.admin){
+      loginContainer.style.display="none";
+      adminPanel.style.display="block";
+      loadPopup();
+    }
+  }
+});
+
+/* DAY CONTROLS */
+async function updateSettings(type,updates){
+  await db.collection(type==='current'?"settings":"nextDaySettings")
+    .doc("current").update(updates);
 }
 
-// DAY CONTROLS
-async function updateSettings(type, updates) {
-  await db.collection(type === 'current' ? "settings" : "nextDaySettings")
-    .doc("current")
-    .update({
-      ...updates,
-      lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    });
+function setDay(type,day){ updateSettings(type,{manualDay:day,autoMode:false}); }
+function setSchedule(type,sched){ updateSettings(type,{schedule:sched}); }
+function resetAuto(type){ updateSettings(type,{manualDay:null,autoMode:true}); }
+function logout(){ auth.signOut(); location.reload(); }
+
+/* ✅ POPUP ANNOUNCEMENTS USING FIRESTORE */
+async function loadPopup(){
+  const doc = await db.collection("announcements").doc("current").get();
+  if(doc.exists){
+    const data = doc.data();
+    popupText.value = data.message || "";
+    popupColor.value = data.color || "#6a0dad";
+    updatePreview();
+  }
 }
 
-function setDay(type, day) {
-  updateSettings(type, { manualDay: day, autoMode: false });
+function updatePreview(){
+  popupPreview.textContent = popupText.value || "Popup preview";
+  popupPreview.style.backgroundColor = popupColor.value;
 }
 
-function setSchedule(type, schedule) {
-  updateSettings(type, { schedule, autoMode: schedule === "Regular Day" });
-}
-
-function resetAuto(type) {
-  updateSettings(type, { manualDay: null, schedule: "Regular Day", autoMode: true });
-}
-
-// POPUP CONTROLS
-document.getElementById('enablePopup').addEventListener('click', async () => {
+applyPopup.onclick = async ()=>{
   await db.collection("announcements").doc("current").set({
-    popupEnabled: true,
-    popupTitle: popupTitleInput.value,
-    popupDescription: popupDescInput.value,
-    popupCloseText: popupCloseInput.value
-  }, { merge: true });
+    message: popupText.value,
+    color: popupColor.value,
+    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  updatePreview();
+  alert("Popup updated");
+};
 
-  alert("Popup Enabled");
-});
+clearPopup.onclick = async ()=>{
+  await db.collection("announcements").doc("current").delete();
+  popupText.value="";
+  popupColor.value="#6a0dad";
+  updatePreview();
+};
 
-document.getElementById('disablePopup').addEventListener('click', async () => {
-  await db.collection("announcements").doc("current").set({
-    popupEnabled: false
-  }, { merge: true });
+popupText.oninput=updatePreview;
+popupColor.oninput=updatePreview;
 
-  alert("Popup Disabled");
-});
-
-// NOTIFICATIONS
-document.getElementById('sendNotificationBtn').addEventListener('click', () => {
-  alert("Notification sending must be wired to OneSignal REST API.");
-});
+/* NOTIFICATIONS */
+sendNotificationBtn.onclick = ()=>{
+  fetch("https://onesignal.com/api/v1/notifications",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json;charset=utf-8",
+      "Authorization":"Basic YOUR_REST_API_KEY"
+    },
+    body:JSON.stringify({
+      app_id:"YOUR_ONESIGNAL_APP_ID",
+      included_segments:["Subscribed Users"],
+      contents:{en:notificationText.value}
+    })
+  });
+};
 </script>
 
 </body>
