@@ -49,79 +49,6 @@ html, body {
   font-size: 1.05rem;
 }
 
-.nav-menu-btn {
-  background: rgba(255,255,255,0.15);
-  color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.nav-menu-btn:hover {
-  background: rgba(255,255,255,0.25);
-}
-
-/* =========================
-   DROPDOWN MENU
-========================= */
-.nav-dropdown {
-  position: absolute;
-  top: 60px;
-  right: 16px;
-  background: rgba(15,15,15,0.96);
-  border-radius: 14px;
-  min-width: 220px;
-  display: none;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.45);
-}
-
-.nav-dropdown a,
-.dropdown-action {
-  padding: 14px 16px;
-  text-align: left;
-  background: none;
-  border: none;
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.nav-dropdown a:hover,
-.dropdown-action:hover {
-  background: rgba(255,255,255,0.08);
-}
-
-.nav-dropdown hr {
-  border: none;
-  height: 1px;
-  background: rgba(255,255,255,0.12);
-}
-
-.nav-dropdown.show {
-  display: flex;
-}
-
-/* =========================
-   ANNOUNCEMENT BAR
-========================= */
-.announcement-bar {
-  position: fixed;
-  top: 60px;
-  width: 100%;
-  padding: 10px;
-  background: #6a0dad;
-  text-align: center;
-  font-size: 0.9rem;
-  z-index: 1500;
-  display: none;
-}
-
 /* =========================
    MAIN CARD
 ========================= */
@@ -172,6 +99,10 @@ html, body {
 ========================= */
 .controls-row {
   margin-top: 14px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .pill {
@@ -180,6 +111,7 @@ html, body {
   border: none;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.3s;
 }
 
 .report-pill {
@@ -189,6 +121,24 @@ html, body {
 
 .report-pill:hover {
   background: rgba(255,255,255,0.28);
+}
+
+.next-day-pill {
+  background: #4CAF50;
+  color: white;
+}
+
+.next-day-pill:hover {
+  background: #45a049;
+}
+
+/* =========================
+   NEXT DAY TEXT
+========================= */
+#nextDayText {
+  margin-top: 8px;
+  font-size: 1rem;
+  color: #ddd;
 }
 
 /* =========================
@@ -204,7 +154,7 @@ html, body {
 }
 
 /* =========================
-   INSTALL POPUP
+   INSTALL / ANNOUNCEMENT POPUP
 ========================= */
 .install-popup {
   position: fixed;
@@ -227,6 +177,25 @@ html, body {
   border-radius: 24px;
   padding: 22px;
   box-shadow: 0 30px 70px rgba(0,0,0,0.7);
+  text-align: center;
+}
+
+.announcement-card {
+  border: 2px solid rgba(255,255,255,0.08);
+}
+
+.announcement-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.warning-icon {
+  font-size: 26px;
+  color: white;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
 }
 
 .popup-top h2 {
@@ -237,34 +206,6 @@ html, body {
   opacity: 0.8;
   font-size: 0.9rem;
   margin-top: 6px;
-}
-
-.platform-toggle {
-  margin-top: 16px;
-  display: flex;
-  overflow: hidden;
-  border-radius: 14px;
-}
-
-.platform-btn {
-  flex: 1;
-  padding: 10px;
-  background: #1a1a1a;
-  border: none;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.platform-btn.active {
-  background: #6a0dad;
-}
-
-.install-instructions {
-  margin-top: 16px;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  opacity: 0.9;
 }
 
 .popup-actions {
@@ -301,28 +242,6 @@ html, body {
   .day-text {
     font-size: 3.2rem;
   }
-
-/* =========================
-   ANNOUNCEMENT POPUP CARD
-========================= */
-
-.announcement-card {
-  border: 2px solid rgba(255,255,255,0.08);
-}
-
-.announcement-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.warning-icon {
-  font-size: 26px;
-  color: white;
-  filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
-}
-
 
   .main-logo {
     width: 110px;
