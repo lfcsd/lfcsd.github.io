@@ -161,18 +161,16 @@ document.addEventListener('DOMContentLoaded', async function() {
   });
 
   // ======================
-  // 7. PUSH NOTIFICATIONS via OneSignal
+  // 7. PUSH NOTIFICATIONS via OneSignal v16
   // ======================
   const notifBtn = document.getElementById('enableNotifBtn');
   if (notifBtn) {
-    notifBtn.addEventListener('click', () => {
-      if (!window.OneSignal) return alert("Notifications not supported.");
-      OneSignal.push(function() {
-        OneSignal.showNativePrompt().then(() => {
-          alert("Notifications enabled!");
-        });
+    notifBtn.addEventListener('click', async () => {
+      if (!window.OneSignalDeferred) return alert("Notifications not supported.");
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.showNativePrompt();
+        alert("Notifications enabled!");
       });
     });
   }
-
 });
