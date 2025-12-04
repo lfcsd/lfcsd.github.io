@@ -1,132 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LFCSD Days Admin Panel</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LFCSD Days Admin Panel</title>
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 
-  <!-- OneSignal SDK -->
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-
-  <style>
-    body {
-      margin: 0; padding: 0;
-      font-family: 'Lexend', sans-serif;
-      background: linear-gradient(135deg, #6a0dad, #8a2be2);
-      color: white;
-      min-height: 100vh;
-    }
-
-    .login-container, .admin-panel {
-      max-width: 500px;
-      margin: 50px auto;
-      background: rgba(0,0,0,0.7);
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .form-group { margin-bottom: 15px; text-align: left; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-    .form-group input, .form-group textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      font-family: 'Lexend', sans-serif;
-    }
-
-    .login-btn, .admin-btn, .apply-btn, .clear-btn, .logout-btn {
-      padding: 10px 15px;
-      border: none; border-radius: 5px;
-      cursor: pointer; font-family: 'Lexend', sans-serif;
-      transition: background 0.3s;
-    }
-
-    .login-btn { width: 100%; background: #8a2be2; color: white; }
-    .login-btn:hover { background: #6a0dad; }
-
-    .admin-btn { background: #8a2be2; color: white; margin: 5px; }
-    .admin-btn:hover { background: #6a0dad; }
-
-    .apply-btn { background-color: #4CAF50; }
-    .clear-btn { background-color: #f44336; }
-    .logout-btn { background: #ff6b6b; color: white; display: block; margin: 20px auto; }
-
-    .announcement-preview {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 5px;
-      text-align: center;
-      background-color: #6a0dad;
-    }
-
-    @media (max-width: 768px) {
-      .admin-buttons { flex-direction: column; }
-    }
-  </style>
+<style>
+body {
+  margin:0; padding:0; font-family:'Lexend',sans-serif;
+  background: linear-gradient(135deg,#6a0dad,#8a2be2);
+  color:white; min-height:100vh;
+}
+.login-container,.admin-panel {
+  max-width:500px; margin:50px auto; background: rgba(0,0,0,0.7);
+  padding:30px; border-radius:10px; text-align:center;
+}
+.form-group { margin-bottom:15px; text-align:left; }
+.form-group label { display:block; margin-bottom:5px; font-weight:bold; }
+.form-group input,.form-group textarea { width:100%; padding:10px; border-radius:5px; border:none; font-family:'Lexend',sans-serif; }
+.login-btn,.admin-btn,.apply-btn,.clear-btn,.logout-btn { padding:10px 15px; border:none; border-radius:5px; cursor:pointer; font-family:'Lexend',sans-serif; transition:background 0.3s; }
+.login-btn { width:100%; background:#8a2be2; color:white; }
+.login-btn:hover { background:#6a0dad; }
+.admin-btn { background:#8a2be2; color:white; margin:5px; }
+.admin-btn:hover { background:#6a0dad; }
+.apply-btn { background-color:#4CAF50; }
+.clear-btn { background-color:#f44336; }
+.logout-btn { background:#ff6b6b; color:white; display:block; margin:20px auto; }
+.announcement-preview { margin-top:20px; padding:15px; border-radius:5px; text-align:center; background-color:#6a0dad; }
+.admin-buttons { display:flex; flex-wrap:wrap; justify-content:center; }
+@media(max-width:768px){ .admin-buttons{ flex-direction:column; } }
+</style>
 </head>
 <body>
 
 <!-- Login Form -->
 <div class="login-container" id="loginContainer">
-  <h2>Admin Login</h2>
-  <div class="error" id="errorMessage"></div>
-  <form id="loginForm">
-    <div class="form-group">
-      <label>Email:</label>
-      <input type="email" id="email" required>
-    </div>
-    <div class="form-group">
-      <label>Password:</label>
-      <input type="password" id="password" required>
-    </div>
-    <button type="submit" class="login-btn">Login</button>
-  </form>
+<h2>Admin Login</h2>
+<div class="error" id="errorMessage"></div>
+<form id="loginForm">
+<div class="form-group"><label>Email:</label><input type="email" id="email" required></div>
+<div class="form-group"><label>Password:</label><input type="password" id="password" required></div>
+<button type="submit" class="login-btn">Login</button>
+</form>
 </div>
 
 <!-- Admin Panel -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
-  <h2>Today's Day Controls</h2>
-  <div class="admin-buttons">
-    <button class="admin-btn" onclick="setDay('current',1)">Day 1</button>
-    <button class="admin-btn" onclick="setDay('current',2)">Day 2</button>
-    <button class="admin-btn" onclick="setSchedule('current','Regular Day')">Regular Day</button>
-    <button class="admin-btn" onclick="setSchedule('current','Half-Day')">Half-Day</button>
-    <button class="admin-btn" onclick="setSchedule('current','2hr Delay')">2 Hour Delay</button>
-    <button class="admin-btn" onclick="resetAuto('current')">Reset Auto</button>
-  </div>
+<h2>Today's Day Controls</h2>
+<div class="admin-buttons">
+<button class="admin-btn" onclick="setDay('current',1)">Day 1</button>
+<button class="admin-btn" onclick="setDay('current',2)">Day 2</button>
+<button class="admin-btn" onclick="setSchedule('current','Regular Day')">Regular Day</button>
+<button class="admin-btn" onclick="setSchedule('current','Half-Day')">Half-Day</button>
+<button class="admin-btn" onclick="setSchedule('current','2hr Delay')">2 Hour Delay</button>
+<button class="admin-btn" onclick="resetAuto('current')">Reset Auto</button>
+</div>
 
-  <h2>Next Day Controls</h2>
-  <div class="admin-buttons">
-    <button class="admin-btn" onclick="setDay('next',1)">Day 1</button>
-    <button class="admin-btn" onclick="setDay('next',2)">Day 2</button>
-    <button class="admin-btn" onclick="setSchedule('next','Regular Day')">Regular Day</button>
-    <button class="admin-btn" onclick="setSchedule('next','Half-Day')">Half-Day</button>
-    <button class="admin-btn" onclick="setSchedule('next','2hr Delay')">2 Hour Delay</button>
-    <button class="admin-btn" onclick="resetAuto('next')">Reset Auto</button>
-  </div>
+<h2>Next Day Controls</h2>
+<div class="admin-buttons">
+<button class="admin-btn" onclick="setDay('next',1)">Day 1</button>
+<button class="admin-btn" onclick="setDay('next',2)">Day 2</button>
+<button class="admin-btn" onclick="setSchedule('next','Regular Day')">Regular Day</button>
+<button class="admin-btn" onclick="setSchedule('next','Half-Day')">Half-Day</button>
+<button class="admin-btn" onclick="setSchedule('next','2hr Delay')">2 Hour Delay</button>
+<button class="admin-btn" onclick="resetAuto('next')">Reset Auto</button>
+</div>
 
-  <h2>Announcements & Notifications</h2>
-  <div class="form-group">
-    <label>Message:</label>
-    <textarea id="announcementText" rows="3" placeholder="Enter announcement text..."></textarea>
-  </div>
-  <div class="form-group">
-    <label>Background Color:</label>
-    <input type="color" id="announcementColor" value="#6a0dad">
-  </div>
-  <div class="admin-buttons">
-    <button class="admin-btn apply-btn" id="applyAnnouncementBtn"><i class="fas fa-bullhorn"></i> Apply & Notify</button>
-    <button class="admin-btn clear-btn" id="clearAnnouncement">Clear Announcement</button>
-  </div>
-  <div class="announcement-preview" id="announcementPreview">Your announcement will appear here</div>
+<h2>Announcements</h2>
+<div class="form-group">
+<label>Message:</label>
+<textarea id="announcementText" rows="3" placeholder="Enter announcement text..."></textarea>
+</div>
+<div class="form-group">
+<label>Background Color:</label>
+<input type="color" id="announcementColor" value="#6a0dad">
+</div>
+<div class="admin-buttons">
+<button class="admin-btn apply-btn" id="applyAnnouncementBtn"><i class="fas fa-bullhorn"></i> Apply Announcement</button>
+<button class="admin-btn clear-btn" id="clearAnnouncement">Clear Announcement</button>
+</div>
+<div class="announcement-preview" id="announcementPreview">Your announcement will appear here</div>
 
-  <button class="logout-btn" onclick="logout()">Logout</button>
+<h2>Notifications</h2>
+<div class="form-group">
+<label>Notification Message:</label>
+<textarea id="notificationText" rows="2" placeholder="Enter notification message..."></textarea>
+</div>
+<div class="admin-buttons">
+<button class="admin-btn apply-btn" id="sendNotificationBtn"><i class="fas fa-bell"></i> Send Notification</button>
+</div>
+
+<button class="logout-btn" onclick="logout()">Logout</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -134,124 +102,127 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
-    authDomain: "lfcsd-days.firebaseapp.com",
-    projectId: "lfcsd-days",
-    storageBucket: "lfcsd-days.appspot.com",
-    messagingSenderId: "520576481150",
-    appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+const firebaseConfig = {
+apiKey:"AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+authDomain:"lfcsd-days.firebaseapp.com",
+projectId:"lfcsd-days",
+storageBucket:"lfcsd-days.appspot.com",
+messagingSenderId:"520576481150",
+appId:"1:520576481150:web:b08a50be7b0d15e113e52f"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  // OneSignal API
-  const ONE_SIGNAL_APP_ID = "YOUR_ONESIGNAL_APP_ID";
-  const ONE_SIGNAL_API_KEY = "YOUR_REST_API_KEY"; // from OneSignal dashboard
+// OneSignal init
+let OneSignal = window.OneSignal || [];
+OneSignal.push(function(){ OneSignal.init({ appId:"YOUR_ONESIGNAL_APP_ID" }); });
 
-  function sendNotification(message) {
-    fetch("https://onesignal.com/api/v1/notifications", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-        "Authorization": `Basic ${ONE_SIGNAL_API_KEY}`
-      },
-      body: JSON.stringify({
-        app_id: ONE_SIGNAL_APP_ID,
-        included_segments: ["Subscribed Users"],
-        contents: { en: message }
-      })
-    }).then(res => res.json())
-      .then(data => console.log("Notification sent:", data))
-      .catch(err => console.error("Notification error:", err));
-  }
+// Send notification separately
+function sendNotification(message){
+  if(!message) return alert("Enter notification text");
+  fetch("https://onesignal.com/api/v1/notifications",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json;charset=utf-8",
+      "Authorization":"Basic YOUR_REST_API_KEY"
+    },
+    body:JSON.stringify({
+      app_id:"YOUR_ONESIGNAL_APP_ID",
+      included_segments:["Subscribed Users"],
+      contents:{en:message}
+    })
+  }).then(res=>res.json()).then(data=>alert("Notification sent")).catch(err=>alert("Notification error"));
+}
 
-  // Login
-  document.getElementById('loginForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    try {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
-      const token = await userCredential.user.getIdTokenResult();
-      if (token.claims.admin) {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadAnnouncement();
-      } else throw new Error("Not admin");
-    } catch (err) { alert("Login failed: " + err.message); auth.signOut(); }
-  });
+// Login
+document.getElementById('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const email=document.getElementById('email').value;
+  const password=document.getElementById('password').value;
+  try{
+    const userCredential = await auth.signInWithEmailAndPassword(email,password);
+    const token = await userCredential.user.getIdTokenResult();
+    if(token.claims.admin){
+      document.getElementById('loginContainer').style.display='none';
+      document.getElementById('adminPanel').style.display='block';
+      loadAnnouncement();
+    } else throw new Error("Not admin");
+  }catch(err){ alert("Login failed: "+err.message); auth.signOut(); }
+});
 
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      const token = await user.getIdTokenResult();
-      if (token.claims.admin) {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadAnnouncement();
-      }
-    }
-  });
-
-  // Admin functions
-  async function updateSettings(type, updates) {
-    try {
-      await db.collection(type === 'current' ? "settings" : "nextDaySettings").doc("current").update({
-        ...updates,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      alert("Settings updated!");
-    } catch (err) { alert("Error: " + err.message); }
-  }
-
-  function setDay(type, day) { updateSettings(type, { manualDay: day, autoMode: false }); }
-  function setSchedule(type, schedule) { updateSettings(type, { schedule: schedule, autoMode: schedule==="Regular Day" }); }
-  function resetAuto(type) { updateSettings(type, { manualDay:null, schedule:"Regular Day", autoMode:true }); }
-  function logout() { auth.signOut(); location.reload(); }
-
-  // Announcement
-  async function loadAnnouncement() {
-    const doc = await db.collection("announcements").doc("current").get();
-    if (doc.exists) {
-      const data = doc.data();
-      document.getElementById('announcementText').value = data.message;
-      document.getElementById('announcementColor').value = data.color;
-      updatePreview();
+auth.onAuthStateChanged(async user=>{
+  if(user){
+    const token = await user.getIdTokenResult();
+    if(token.claims.admin){
+      document.getElementById('loginContainer').style.display='none';
+      document.getElementById('adminPanel').style.display='block';
+      loadAnnouncement();
     }
   }
+});
 
-  function updatePreview() {
-    const text = document.getElementById('announcementText').value;
-    const color = document.getElementById('announcementColor').value;
-    const preview = document.getElementById('announcementPreview');
-    preview.textContent = text || "Your announcement will appear here";
-    preview.style.backgroundColor = color;
-  }
-
-  document.getElementById('applyAnnouncementBtn').addEventListener('click', async () => {
-    const message = document.getElementById('announcementText').value.trim();
-    const color = document.getElementById('announcementColor').value;
-    if (!message) { alert("Enter a message"); return; }
-    await db.collection("announcements").doc("current").set({
-      message, color, lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+// Admin functions
+async function updateSettings(type,updates){
+  try{
+    await db.collection(type==='current'?"settings":"nextDaySettings").doc("current").update({
+      ...updates,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()
     });
-    updatePreview();
-    sendNotification(message);
-    alert("Announcement updated & notification sent!");
-  });
+    alert("Settings updated!");
+  }catch(err){ alert("Error: "+err.message); }
+}
+function setDay(type,day){ updateSettings(type,{manualDay:day,autoMode:false}); }
+function setSchedule(type,schedule){ updateSettings(type,{schedule:schedule,autoMode:schedule==="Regular Day"}); }
+function resetAuto(type){ updateSettings(type,{manualDay:null,schedule:"Regular Day",autoMode:true}); }
+function logout(){ auth.signOut(); location.reload(); }
 
-  document.getElementById('clearAnnouncement').addEventListener('click', async () => {
-    await db.collection("announcements").doc("current").delete();
-    document.getElementById('announcementText').value = "";
-    document.getElementById('announcementColor').value = "#6a0dad";
+// Announcements
+async function loadAnnouncement(){
+  const doc = await db.collection("announcements").doc("current").get();
+  if(doc.exists){
+    const data = doc.data();
+    document.getElementById('announcementText').value = data.message;
+    document.getElementById('announcementColor').value = data.color;
     updatePreview();
-    alert("Announcement cleared!");
-  });
+  }
+}
 
-  document.getElementById('announcementText').addEventListener('input', updatePreview);
-  document.getElementById('announcementColor').addEventListener('input', updatePreview);
+function updatePreview(){
+  const text = document.getElementById('announcementText').value;
+  const color = document.getElementById('announcementColor').value;
+  const preview = document.getElementById('announcementPreview');
+  preview.textContent = text||"Your announcement will appear here";
+  preview.style.backgroundColor=color;
+}
+
+document.getElementById('applyAnnouncementBtn').addEventListener('click',async ()=>{
+  const message = document.getElementById('announcementText').value.trim();
+  const color = document.getElementById('announcementColor').value;
+  if(!message) return alert("Enter a message");
+  await db.collection("announcements").doc("current").set({
+    message,color,lastUpdated:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  updatePreview();
+  alert("Announcement updated!");
+});
+
+document.getElementById('clearAnnouncement').addEventListener('click',async ()=>{
+  await db.collection("announcements").doc("current").delete();
+  document.getElementById('announcementText').value="";
+  document.getElementById('announcementColor').value="#6a0dad";
+  updatePreview();
+  alert("Announcement cleared!");
+});
+
+// Notification send button
+document.getElementById('sendNotificationBtn').addEventListener('click',()=>{
+  const msg = document.getElementById('notificationText').value.trim();
+  sendNotification(msg);
+});
+
+document.getElementById('announcementText').addEventListener('input',updatePreview);
+document.getElementById('announcementColor').addEventListener('input',updatePreview);
 </script>
+
 </body>
 </html>
