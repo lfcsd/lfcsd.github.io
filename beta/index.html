@@ -26,13 +26,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    
-    window.firebase = { 
-      db,
-      app,
-      firestore: { getFirestore }
-    };
-    
+
+    window.firebase = { db, app, firestore: { getFirestore } };
     console.log("Firebase initialized successfully");
   </script>
 
@@ -41,16 +36,15 @@
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "b655dea8-a108-4112-9cbb-f5f6e3c9e012",
-      });
+      await OneSignal.init({ appId: "b655dea8-a108-4112-9cbb-f5f6e3c9e012" });
     });
   </script>
 
-  <script src="script.js" defer></script>
+  <script src="script.js" type="module" defer></script>
 </head>
 <body>
 
+<!-- NAVBAR -->
 <nav class="navbar" role="navigation" aria-label="Main">
   <div class="nav-left">
     <img src="/logo.png" alt="LFCSD Logo" class="nav-logo">
@@ -68,50 +62,37 @@
   </div>
 </nav>
 
-<!-- Announcement Popup -->
-<div id="installPopup" class="install-popup hidden">
+<!-- ANNOUNCEMENT POPUP (Firestore-driven) -->
+<div id="announcementPopup" class="install-popup hidden">
   <div class="popup-card announcement-card">
 
     <div class="announcement-header">
-      <i class="fas fa-triangle-exclamation warning-icon"></i>
+      <i class="fas fa-triangle-exclamation warning-icon" style="color:white;font-size:1.5rem;"></i>
       <h2 id="popupTitle">Announcement</h2>
     </div>
 
     <p class="muted" id="popupDescription"></p>
 
     <div class="popup-actions">
-      <button id="dismissInstall" class="dismiss">Close</button>
+      <button id="dismissAnnouncement" class="dismiss">Close</button>
     </div>
 
   </div>
 </div>
 
+<!-- MAIN CARD -->
+<main class="card">
+  <img src="/logo.png" class="main-logo" alt="logo">
+  <div id="specialSchedule"></div>
+  <div id="dayText" class="day-text">Loading...</div>
+  <div id="timeDisplay" class="time-display"></div>
+
+  <div class="controls-row">
+    <button id="reportBtn" class="pill report-pill">Report</button>
+  </div>
+</main>
 
 <footer class="footer">This website is not affiliated with LFCSD</footer>
-
-<!-- Improved Install Popup -->
-<div id="installPopup" class="install-popup hidden">
-  <div class="popup-card">
-    <div class="popup-top">
-      <h2>Get the LFCSD Days Web App</h2>
-      <p class="muted">The web app is faster, more optimized, and supports notifications & reminders.</p>
-    </div>
-
-    <div class="platform-toggle">
-      <button class="platform-btn active" data-platform="ios">iOS</button>
-      <button class="platform-btn" data-platform="android">Android</button>
-    </div>
-
-    <div id="installInstructions" class="install-instructions">
-      Tap the Share icon, then select "Add to Home Screen".
-    </div>
-
-    <div class="popup-actions">
-      <button id="installAction" class="cta">Install</button>
-      <button id="dismissInstall" class="dismiss">Dismiss</button>
-    </div>
-  </div>
-</div>
 
 <script>
   if ('serviceWorker' in navigator) {
