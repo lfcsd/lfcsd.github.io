@@ -10,11 +10,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Firebase Init -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
+   <!-- Firebase SDK v9 (modular version) - ONLY INITIALIZATION -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
@@ -27,7 +26,14 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    window.firebase = { db, app };
+    
+    window.firebase = { 
+      db,
+      app,
+      firestore: { getFirestore }
+    };
+    
+    console.log("Firebase initialized successfully");
   </script>
 
   <!-- OneSignal v16 SDK -->
