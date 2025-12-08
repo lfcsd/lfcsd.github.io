@@ -10,8 +10,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
- 
-  <!-- Firebase SDK v9 (modular version) - ONLY INITIALIZATION -->
+
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
@@ -36,41 +35,145 @@
     
     console.log("Firebase initialized successfully");
   </script>
-  
 
   <script src="script.js" defer></script>
 
+  <!-- ✅ POPUP STYLES -->
+  <style>
+    .beta-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: 'Lexend', sans-serif;
+    }
+
+    .beta-popup {
+      background: #111;
+      color: white;
+      padding: 25px 30px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      animation: popUp 0.25s ease;
+    }
+
+    .beta-popup h2 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .beta-popup p {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    .beta-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .beta-buttons button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .beta-yes {
+      background: #00b3ff;
+      color: white;
+    }
+
+    .beta-no {
+      background: #222;
+      color: white;
+    }
+
+    @keyframes popUp {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+
 </head>
 <body>
+
+<!-- ✅ BETA POPUP -->
+<div class="beta-overlay" id="betaPopup">
+  <div class="beta-popup">
+    <h2>Try Our New Site Look?</h2>
+    <p>You can preview our updated design right now.</p>
+    <div class="beta-buttons">
+      <button class="beta-yes" id="betaYes">Sure</button>
+      <button class="beta-no" id="betaNo">Not now</button>
+    </div>
+  </div>
+</div>
+
 <div id="announcementBar" class="announcement-bar"></div>  
 
 <div class="report-btn" id="reportBtn">
   <div class="exclamation-mark">!</div>
 </div>
 
-  <div class="menu-btn" id="menuBtn">
-    <i class="fas fa-bars"></i>
-  </div>
-  
-  <div class="dropdown-menu" id="dropdownMenu">
-    <a href="/" class="menu-item">Today's Day</a>
-    <a href="/days/next/" class="menu-item">Next Day</a>
-  </div>
+<div class="menu-btn" id="menuBtn">
+  <i class="fas fa-bars"></i>
+</div>
 
- <div class="container">
-    <div class="logo-container">
-      <img src="logo.png" alt="School Logo" class="logo" id="logo">
-    </div>
-    <div class="day-container">
-      <div class="special-schedule" id="specialSchedule"></div>
-      <div class="day-text" id="dayText">Loading...</div>
-    </div>
-  </div>
+<div class="dropdown-menu" id="dropdownMenu">
+  <a href="/" class="menu-item">Today's Day</a>
+  <a href="/days/next/" class="menu-item">Next Day</a>
+</div>
 
-  <div class="time-display" id="timeDisplay"></div>
-
-  <div class="footer">
-    This website is not affiliated with LFCSD
+<div class="container">
+  <div class="logo-container">
+    <img src="logo.png" alt="School Logo" class="logo" id="logo">
   </div>
+  <div class="day-container">
+    <div class="special-schedule" id="specialSchedule"></div>
+    <div class="day-text" id="dayText">Loading...</div>
+  </div>
+</div>
+
+<div class="time-display" id="timeDisplay"></div>
+
+<div class="footer">
+  This website is not affiliated with LFCSD
+</div>
+
+<!-- ✅ POPUP SCRIPT -->
+<script>
+  const betaPopup = document.getElementById("betaPopup");
+  const betaYes = document.getElementById("betaYes");
+  const betaNo = document.getElementById("betaNo");
+
+  setTimeout(() => {
+    betaPopup.style.display = "flex";
+  }, 800);
+
+  betaYes.addEventListener("click", () => {
+    window.location.href = "/beta";
+  });
+
+  betaNo.addEventListener("click", () => {
+    betaPopup.style.display = "none";
+  });
+</script>
+
 </body>
 </html>
