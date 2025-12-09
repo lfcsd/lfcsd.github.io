@@ -76,25 +76,35 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   // ======================
-  // NEXT DAY BUTTON
-  // ======================
-  if (nextDayBtn && dayTextEl) {
-    nextDayBtn.addEventListener('click', async () => {
-      try {
-        const doc = await db.collection('settings').doc('nextDaySettings').get();
-        let nextDayNum = 1;
-        if (doc.exists) {
-          nextDayNum = doc.data()?.manualDay || ((calculateCurrentDay() % 2) + 1);
-        } else {
-          nextDayNum = ((calculateCurrentDay() % 2) + 1);
-        }
-        dayTextEl.textContent = `Tomorrow will be a Day ${nextDayNum}`;
-      } catch(err) {
-        console.error(err);
-        dayTextEl.textContent = 'Unable to load next day';
+// NEXT DAY BUTTON
+// ======================
+if (nextDayBtn && dayTextEl) {
+  nextDayBtn.addEventListener('click', async () => {
+
+    try {
+      const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+
+      const nextDayRef = doc(db, "settings", "nextDaySettings");
+      const docSnap = await getDoc(nextDayRef);
+
+      let nextDayNum = 1;
+
+      if (docSnap.exists()) {
+        nextDayNum = docSnap.data()?.manualDay || ((calculateCurrentDay() % 2) + 1);
+      } else {
+        nextDayNum = ((calculateCurrentDay() % 2) + 1);
       }
-    });
-  }
+
+      dayTextEl.textContent = `Tomorrow will be a Day ${nextDayNum}`;
+
+    } catch (err) {
+      console.error(err);
+      dayTextEl.textContent = 'Unable to load next day';
+    }
+
+  });
+}
+
 
   // ======================
   // LIVE CLOCK
