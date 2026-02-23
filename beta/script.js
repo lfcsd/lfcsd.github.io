@@ -120,7 +120,7 @@ if (nextDayBtn && dayTextEl) {
   // ======================
   // DAY CALCULATION
   // ======================
-  const START_DATE = new Date('2025-10-12T00:00:00-05:00');
+  const START_DATE = new Date('2025-10-13T00:00:00-05:00');
 
   function getCurrentESTDate() {
     const now = new Date();
