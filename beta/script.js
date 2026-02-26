@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   const dayTextEl = document.getElementById('dayText');
   const specialScheduleEl = document.getElementById('specialSchedule');
   const timeDisplayEl = document.getElementById('timeDisplay');
+  const periodsContainer = document.getElementById('periodsContainer');
 
   const announcementPopup = document.getElementById('announcementPopup');
   const popupTitle = document.getElementById('popupTitle');
@@ -40,7 +41,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       dropdownMenu.classList.toggle('show');
       menuBtn.setAttribute("aria-expanded", dropdownMenu.classList.contains('show'));
     });
-
     document.addEventListener('click', (event) => {
       if (!menuBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
         dropdownMenu.classList.remove('show');
@@ -76,35 +76,27 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   // ======================
-// NEXT DAY BUTTON
-// ======================
-if (nextDayBtn && dayTextEl) {
-  nextDayBtn.addEventListener('click', async () => {
-
-    try {
-      const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
-
-      const nextDayRef = doc(db, "settings", "nextDaySettings");
-      const docSnap = await getDoc(nextDayRef);
-
-      let nextDayNum = 1;
-
-      if (docSnap.exists()) {
-        nextDayNum = docSnap.data()?.manualDay || ((calculateCurrentDay() % 2) + 1);
-      } else {
-        nextDayNum = ((calculateCurrentDay() % 2) + 1);
+  // NEXT DAY BUTTON
+  // ======================
+  if (nextDayBtn && dayTextEl) {
+    nextDayBtn.addEventListener('click', async () => {
+      try {
+        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+        const nextDayRef = doc(db, "settings", "nextDaySettings");
+        const docSnap = await getDoc(nextDayRef);
+        let nextDayNum = 1;
+        if (docSnap.exists()) {
+          nextDayNum = docSnap.data()?.manualDay || ((calculateCurrentDay() % 2) + 1);
+        } else {
+          nextDayNum = ((calculateCurrentDay() % 2) + 1);
+        }
+        dayTextEl.textContent = `Tomorrow will be a Day ${nextDayNum}`;
+      } catch (err) {
+        console.error(err);
+        dayTextEl.textContent = 'Unable to load next day';
       }
-
-      dayTextEl.textContent = `Tomorrow will be a Day ${nextDayNum}`;
-
-    } catch (err) {
-      console.error(err);
-      dayTextEl.textContent = 'Unable to load next day';
-    }
-
-  });
-}
-
+    });
+  }
 
   // ======================
   // LIVE CLOCK
@@ -190,9 +182,35 @@ if (nextDayBtn && dayTextEl) {
         dayTextEl.textContent = `Day ${data.manualDay}`;
       }
     });
+
+    // BELL SCHEDULE LIVE HIGHLIGHT
+    const bellDoc = doc(db, "bellSchedules", "today");
+    onSnapshot(bellDoc, (snap) => {
+      if (!snap.exists() || !periodsContainer) return;
+      const data = snap.data();
+      const periods = data.periods || [];
+      periodsContainer.innerHTML = '';
+      const now = getCurrentESTDate();
+      periods.forEach(p => {
+        const bubble = document.createElement('div');
+        bubble.className = 'period-bubble';
+        bubble.textContent = `${p.name} ${p.start}-${p.end}`;
+        if (isNowInPeriod(now, p.start, p.end)) bubble.classList.add('current');
+        periodsContainer.appendChild(bubble);
+      });
+    });
+
   } catch (err) {
     console.error("Firestore import or listener error:", err);
     if (dayTextEl) dayTextEl.textContent = "Connection Error";
+  }
+
+  function isNowInPeriod(now, start, end) {
+    const [sH, sM] = start.split(':').map(Number);
+    const [eH, eM] = end.split(':').map(Number);
+    const startTime = new Date(now); startTime.setHours(sH, sM, 0, 0);
+    const endTime = new Date(now); endTime.setHours(eH, eM, 0, 0);
+    return now >= startTime && now <= endTime;
   }
 
   // ======================
@@ -201,4 +219,5 @@ if (nextDayBtn && dayTextEl) {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/OneSignalSDKWorker.js');
   }
+
 });
