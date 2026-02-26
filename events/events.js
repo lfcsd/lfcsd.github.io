@@ -5,51 +5,109 @@ import {
 
 const listEl = document.getElementById("eventsList");
 
-// Format today's key like: 2026-02-26
-const today = new Date();
-const todayKey = today.toISOString().split("T")[0];
+/* ---------- Helpers ---------- */
+
+// Local YYYY-MM-DD (prevents UTC shifting bug)
+function toDateKey(d) {
+  return d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+}
+
+// Convert "6:30 PM" → Date for sorting
+function parseTime(timeStr) {
+  if (!timeStr) return new Date(0);
+
+  const [time, modifier] = timeStr.split(" ");
+  let [h, m] = time.split(":").map(Number);
+
+  if (modifier === "PM" && h !== 12) h += 12;
+  if (modifier === "AM" && h === 12) h = 0;
+
+  const d = new Date();
+  d.setHours(h, m || 0, 0, 0);
+  return d;
+}
+
+// Pretty date like "Friday, Feb 28"
+function prettyDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric"
+  });
+}
+
+/* ---------- Load Events ---------- */
 
 async function loadEvents() {
   try {
     const snapshot = await getDocs(collection(window.db, "events"));
 
-    const todaysEvents = [];
+    const allEvents = [];
+    snapshot.forEach(doc => allEvents.push(doc.data()));
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
+    if (!allEvents.length) {
+      listEl.innerHTML = `<div class="time-display">No scheduled events.</div>`;
+      return;
+    }
 
-      // Expect Firestore structure:
-      // { title: "...", date: "YYYY-MM-DD", time: "...", location: "..." }
-      if (data.date === todayKey) {
-        todaysEvents.push(data);
-      }
+    const todayKey = toDateKey(new Date());
+
+    // Group events by date
+    const grouped = {};
+    allEvents.forEach(ev => {
+      if (!grouped[ev.date]) grouped[ev.date] = [];
+      grouped[ev.date].push(ev);
     });
 
-    renderEvents(todaysEvents);
+    /* ---------- 1️⃣ Try today ---------- */
+    if (grouped[todayKey]) {
+      renderDay("Today", todayKey, grouped[todayKey]);
+      return;
+    }
+
+    /* ---------- 2️⃣ Find next upcoming day ---------- */
+    const futureDates = Object.keys(grouped)
+      .filter(d => d > todayKey)
+      .sort(); // chronological
+
+    if (!futureDates.length) {
+      listEl.innerHTML = `<div class="time-display">No upcoming events.</div>`;
+      return;
+    }
+
+    const nextDate = futureDates[0];
+    renderDay("Upcoming", nextDate, grouped[nextDate]);
+
   } catch (err) {
-    listEl.innerHTML = `<div class="time-display">Failed to load events.</div>`;
     console.error(err);
+    listEl.innerHTML = `<div class="time-display">Failed to load events.</div>`;
   }
 }
 
-function renderEvents(events) {
-  if (!events.length) {
-    listEl.innerHTML = `<div class="time-display">No events today.</div>`;
-    return;
-  }
+/* ---------- Render ---------- */
 
-  listEl.innerHTML = "";
+function renderDay(label, dateKey, events) {
 
-  events.sort((a,b)=> (a.time || "").localeCompare(b.time || ""));
+  // Sort events by time
+  events.sort((a, b) => parseTime(a.time) - parseTime(b.time));
 
-  events.forEach(event => {
+  listEl.innerHTML = `
+    <div class="events-heading">
+      ${label} — ${prettyDate(dateKey)}
+    </div>
+  `;
+
+  events.forEach(ev => {
     const card = document.createElement("div");
     card.className = "event-card";
 
     card.innerHTML = `
-      <strong>${event.title}</strong>
-      <span>${event.time || ""}</span>
-      <em>${event.location || ""}</em>
+      <div class="event-time">${ev.time || "All Day"}</div>
+      <div class="event-title">${ev.title}</div>
+      ${ev.location ? `<div class="event-location">${ev.location}</div>` : ""}
     `;
 
     listEl.appendChild(card);
