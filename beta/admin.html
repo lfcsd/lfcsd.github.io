@@ -4,172 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LFCSD Days Admin Panel</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-
 <style>
-body {
-  margin:0;
-  padding:0;
-  font-family:'Lexend',sans-serif;
-  background: linear-gradient(135deg,#6a0dad,#8a2be2);
-  color:white;
-  min-height:100vh;
-}
-.login-container, .admin-panel {
-  max-width:600px;
-  margin:50px auto;
-  background: rgba(0,0,0,0.7);
-  padding:30px;
-  border-radius:15px;
-  text-align:center;
-}
-.form-group { margin-bottom:15px; text-align:left; }
-.form-group label { display:block; margin-bottom:5px; font-weight:bold; }
-.form-group input, .form-group textarea {
-  width:100%;
-  padding:10px;
-  border-radius:5px;
-  border:none;
-  font-family:'Lexend',sans-serif;
-}
-button {
-  padding:10px 15px;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-  font-family:'Lexend',sans-serif;
-  transition: background 0.3s;
-}
-.login-btn { width:100%; background:#8a2be2; color:white; }
-.login-btn:hover { background:#6a0dad; }
-.admin-btn { background:#8a2be2; color:white; margin:5px; }
-.admin-btn:hover { background:#6a0dad; }
-.apply-btn { background-color:#4CAF50; }
-.clear-btn { background-color:#f44336; }
-.logout-btn {
-  background:#ff6b6b;
-  color:white;
-  display:block;
-  margin:20px auto;
-}
-.admin-buttons {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-bottom:20px;
-}
-.announcement-section, .notification-section {
-  background: rgba(255,255,255,0.05);
-  padding:20px;
-  border-radius:10px;
-  margin-top:25px;
-  text-align:left;
-}
-.announcement-section h2, .notification-section h2 {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:1.3em;
-  margin-bottom:15px;
-}
-.announcement-preview {
-  margin-top:10px;
-  padding:15px;
-  border-radius:5px;
-  text-align:center;
-  background-color:#6a0dad;
-  color:white;
-  font-weight:bold;
-}
+body{margin:0;padding:0;font-family:'Lexend',sans-serif;background:linear-gradient(135deg,#6a0dad,#8a2be2);color:white;min-height:100vh;}
+.admin-panel,.login-container{max-width:600px;margin:50px auto;background:rgba(0,0,0,0.7);padding:30px;border-radius:15px;text-align:center;}
+.form-group{margin-bottom:15px;text-align:left;}
+.form-group label{display:block;margin-bottom:5px;font-weight:bold;}
+.form-group input,.form-group textarea{width:100%;padding:10px;border-radius:5px;border:none;font-family:'Lexend',sans-serif;}
+button{padding:10px 15px;border:none;border-radius:5px;cursor:pointer;font-family:'Lexend',sans-serif;transition:background 0.3s;}
+.admin-btn{background:#8a2be2;color:white;margin:5px;} .admin-btn:hover{background:#6a0dad;}
+.apply-btn{background-color:#4CAF50;}
+.clear-btn{background-color:#f44336;}
+.logout-btn{background:#ff6b6b;color:white;display:block;margin:20px auto;}
+.admin-buttons{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
 </style>
 </head>
-
 <body>
-
-<!-- LOGIN (UNCHANGED) -->
 <div class="login-container" id="loginContainer">
   <h2>Admin Login</h2>
   <form id="loginForm">
-    <div class="form-group">
-      <label>Email:</label>
-      <input type="email" id="email" required>
-    </div>
-    <div class="form-group">
-      <label>Password:</label>
-      <input type="password" id="password" required>
-    </div>
-    <button type="submit" class="login-btn">Login</button>
+    <div class="form-group"><label>Email:</label><input type="email" id="email" required></div>
+    <div class="form-group"><label>Password:</label><input type="password" id="password" required></div>
+    <button type="submit" class="admin-btn">Login</button>
   </form>
 </div>
 
-<!-- ADMIN -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
-  <h2>Today's Day Controls</h2>
+  <h2>Bell Schedule Today</h2>
   <div class="admin-buttons">
-    <button class="admin-btn" onclick="setDay('current',1)">Day 1</button>
-    <button class="admin-btn" onclick="setDay('current',2)">Day 2</button>
-    <button class="admin-btn" onclick="setSchedule('current','Regular Day')">Regular Day</button>
-    <button class="admin-btn" onclick="setSchedule('current','Half-Day')">Half-Day</button>
-    <button class="admin-btn" onclick="setSchedule('current','2hr Delay')">2 Hour Delay</button>
-    <button class="admin-btn" onclick="resetAuto('current')">Reset Auto</button>
+    <button class="admin-btn" onclick="setScheduleMode('regular')">Regular Day</button>
+    <button class="admin-btn" onclick="setScheduleMode('half')">Half Day</button>
   </div>
 
-  <h2>Next Day Controls</h2>
-  <div class="admin-buttons">
-    <button class="admin-btn" onclick="setDay('next',1)">Day 1</button>
-    <button class="admin-btn" onclick="setDay('next',2)">Day 2</button>
-    <button class="admin-btn" onclick="setSchedule('next','Regular Day')">Regular Day</button>
-    <button class="admin-btn" onclick="setSchedule('next','Half-Day')">Half-Day</button>
-    <button class="admin-btn" onclick="setSchedule('next','2hr Delay')">2 Hour Delay</button>
-    <button class="admin-btn" onclick="resetAuto('next')">Reset Auto</button>
-  </div>
-
- <!-- POPUP ANNOUNCEMENTS (MODAL) -->
-<div class="announcement-section">
-  <h2><i class="fas fa-bullhorn"></i> Popup Announcements</h2>
-
-  <div class="form-group">
-    <label>Popup Title:</label>
-    <input type="text" id="popupTitleInput" placeholder="Announcement Title">
-  </div>
-
-  <div class="form-group">
-    <label>Popup Message:</label>
-    <textarea id="popupText" rows="3" placeholder="Your announcement here"></textarea>
-  </div>
-
-  <div class="form-group">
-    <label>Popup Background Color:</label>
-    <input type="color" id="popupColor" value="#6a0dad">
-  </div>
-
-  <div class="admin-buttons">
-    <button class="admin-btn apply-btn" id="applyPopup">Apply Popup</button>
-    <button class="admin-btn clear-btn" id="clearPopup">Clear Popup</button>
-  </div>
-
-  <div class="announcement-preview" id="popupPreview">Modal preview</div>
-</div>
-
-  <!-- NOTIFICATIONS -->
-  <div class="notification-section">
-    <h2><i class="fas fa-bell"></i> Notifications</h2>
-    <div class="form-group">
-      <label>Notification Message:</label>
-      <textarea id="notificationText" rows="2"></textarea>
-    </div>
-    <div class="admin-buttons">
-      <button class="admin-btn apply-btn" id="sendNotificationBtn">Send Notification</button>
-    </div>
-  </div>
-
+  <div id="periodInputs"></div>
+  <button class="admin-btn apply-btn" id="applyPeriods">Apply Changes</button>
   <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -180,116 +52,88 @@ firebase.initializeApp({
   authDomain:"lfcsd-days.firebaseapp.com",
   projectId:"lfcsd-days"
 });
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* LOGIN UNCHANGED */
-document.getElementById('loginForm').addEventListener('submit', async e=>{
+const loginContainer=document.getElementById('loginContainer');
+const adminPanel=document.getElementById('adminPanel');
+const periodInputs=document.getElementById('periodInputs');
+const applyBtn=document.getElementById('applyPeriods');
+
+let currentPeriods = [];
+
+const predefined = {
+  regular: [
+    { name: "HR", start: "08:00", end: "08:20" },
+    { name: "1", start: "08:24", end: "09:04" },
+    { name: "2", start: "09:08", end: "09:48" },
+    { name: "3", start: "09:52", end: "10:32" },
+    { name: "4", start: "10:36", end: "11:16" },
+    { name: "5", start: "11:20", end: "12:00" },
+    { name: "6", start: "12:04", end: "12:44" },
+    { name: "7", start: "12:48", end: "13:28" },
+    { name: "8", start: "13:32", end: "14:12" },
+    { name: "9", start: "14:16", end: "14:54" }
+  ],
+  half: [
+    { name: "1", start: "08:00", end: "08:21" },
+    { name: "2", start: "08:24", end: "08:45" },
+    { name: "3", start: "08:48", end: "09:09" },
+    { name: "4", start: "09:12", end: "09:33" },
+    { name: "5", start: "09:36", end: "09:57" },
+    { name: "6", start: "10:00", end: "10:20" },
+    { name: "7", start: "10:23", end: "10:43" },
+    { name: "8", start: "10:46", end: "11:06" },
+    { name: "9", start: "11:09", end: "11:30" }
+  ]
+};
+
+function renderPeriods(periods){
+  currentPeriods = [...periods];
+  periodInputs.innerHTML='';
+  periods.forEach((p,i)=>{
+    const div = document.createElement('div');
+    div.className='form-group';
+    div.innerHTML=`
+      <label>Period ${p.name}</label>
+      <input type="text" value="${p.start}" placeholder="Start (HH:MM)" data-index="${i}" class="start-time">
+      <input type="text" value="${p.end}" placeholder="End (HH:MM)" data-index="${i}" class="end-time">
+    `;
+    periodInputs.appendChild(div);
+  });
+}
+
+function setScheduleMode(mode){
+  const periods = predefined[mode]||[];
+  renderPeriods(periods);
+  db.collection('bellSchedules').doc('today').set({mode, periods})
+    .then(()=>alert(mode+' schedule applied!'))
+    .catch(e=>alert(e));
+}
+
+applyBtn.addEventListener('click',()=>{
+  const inputs = periodInputs.querySelectorAll('input');
+  inputs.forEach(input=>{
+    const idx = input.dataset.index;
+    if(input.classList.contains('start-time')) currentPeriods[idx].start=input.value;
+    if(input.classList.contains('end-time')) currentPeriods[idx].end=input.value;
+  });
+  db.collection('bellSchedules').doc('today').set({mode:'custom', periods:currentPeriods})
+    .then(()=>alert('Custom schedule applied!'))
+    .catch(e=>alert(e));
+});
+
+// SIMPLE LOGIN (admin claim assumed for demo)
+document.getElementById('loginForm').addEventListener('submit', e=>{
   e.preventDefault();
   const email=document.getElementById('email').value;
   const password=document.getElementById('password').value;
-  const userCredential = await auth.signInWithEmailAndPassword(email,password);
-  const token = await userCredential.user.getIdTokenResult();
-
-  if(token.claims.admin){
-    loginContainer.style.display="none";
-    adminPanel.style.display="block";
-    loadPopup();
-  } else {
-    alert("Not admin");
-    auth.signOut();
-  }
+  auth.signInWithEmailAndPassword(email,password)
+    .then(()=>{loginContainer.style.display='none'; adminPanel.style.display='block';})
+    .catch(err=>alert(err.message));
 });
 
-auth.onAuthStateChanged(async user=>{
-  if(user){
-    const token = await user.getIdTokenResult();
-    if(token.claims.admin){
-      loginContainer.style.display="none";
-      adminPanel.style.display="block";
-      loadPopup();
-    }
-  }
-});
-
-/* DAY CONTROLS */
-async function updateSettings(type,updates){
-  await db.collection(type==='current'?"settings":"nextDaySettings")
-    .doc("current").update(updates);
-}
-
-function setDay(type,day){ updateSettings(type,{manualDay:day,autoMode:false}); }
-function setSchedule(type,sched){ updateSettings(type,{schedule:sched}); }
-function resetAuto(type){ updateSettings(type,{manualDay:null,autoMode:true}); }
-function logout(){ auth.signOut(); location.reload(); }
-
-/* ✅ POPUP ANNOUNCEMENTS USING FIRESTORE MODAL */
-async function loadPopup(){
-  const doc = await db.collection("announcements").doc("current").get();
-  if(doc.exists){
-    const data = doc.data();
-    popupText.value = data.popupDescription || "";
-    popupTitleInput.value = data.popupTitle || "";
-    popupColor.value = data.popupColor || "#6a0dad";
-    updatePreview();
-  }
-}
-
-function updatePreview(){
-  popupPreview.textContent = popupText.value || "Modal preview";
-  popupPreview.style.backgroundColor = popupColor.value;
-  popupPreview.style.padding = "15px";
-  popupPreview.style.borderRadius = "10px";
-  popupPreview.style.fontWeight = "bold";
-}
-
-applyPopup.onclick = async ()=>{
-  await db.collection("announcements").doc("current").set({
-    popupEnabled: true,
-    popupTitle: popupTitleInput.value,
-    popupDescription: popupText.value,
-    popupColor: popupColor.value,
-    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  updatePreview();
-  alert("Modal popup updated!");
-};
-
-clearPopup.onclick = async ()=>{
-  await db.collection("announcements").doc("current").set({
-    popupEnabled: false,
-    popupTitle: "",
-    popupDescription: "",
-    popupColor: "#6a0dad",
-    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  popupText.value="";
-  popupTitleInput.value="";
-  popupColor.value="#6a0dad";
-  updatePreview();
-};
-
-popupText.oninput = updatePreview;
-popupTitleInput.oninput = updatePreview;
-popupColor.oninput = updatePreview;
-
-/* NOTIFICATIONS */
-sendNotificationBtn.onclick = ()=>{
-  fetch("https://onesignal.com/api/v1/notifications",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json;charset=utf-8",
-      "Authorization":"Basic YOUR_REST_API_KEY"
-    },
-    body:JSON.stringify({
-      app_id:"YOUR_ONESIGNAL_APP_ID",
-      included_segments:["Subscribed Users"],
-      contents:{en:notificationText.value}
-    })
-  });
-};
+function logout(){auth.signOut().then(()=>{loginContainer.style.display='block'; adminPanel.style.display='none';});}
 </script>
-
 </body>
 </html>
