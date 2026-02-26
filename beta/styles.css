@@ -252,44 +252,50 @@ html, body {
   }
 }
 
-/* EVENTS PAGE */
+/* EVENTS LIST — vertical stack */
 .events-list {
   display:flex;
   flex-direction:column;
-  gap:12px;
+  align-items:stretch;
+  gap:14px;
   width:100%;
-  max-width:420px;
+  max-width:460px;
   margin-top:10px;
 }
 
+/* INDIVIDUAL EVENT */
 .event-card {
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.28);
-  border-radius:22px;
-  padding:16px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.35);
-  text-align:center;
+  background: rgba(255,255,255,0.20);
+  border: 1px solid rgba(255,255,255,0.30);
+  border-radius:24px;
+  padding:18px 20px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.35);
+  text-align:left;
   transition: all .25s ease;
 }
 
 .event-card:hover {
-  background: rgba(255,255,255,0.26);
   transform: translateY(-2px);
+  background: rgba(255,255,255,0.28);
 }
 
-.event-card strong {
-  display:block;
-  font-size:1.1rem;
+/* Time (top line) */
+.event-time {
+  font-size:.9rem;
+  opacity:.75;
+  margin-bottom:4px;
 }
 
-.event-card span {
-  opacity:.9;
-  font-size:.95rem;
+/* Event title (main focus) */
+.event-title {
+  font-size:1.25rem;
+  font-weight:700;
+  margin-bottom:4px;
 }
 
-.event-card em {
+/* Location (secondary info) */
+.event-location {
+  font-size:.9rem;
   opacity:.7;
-  font-size:.85rem;
-  font-style:normal;
 }
