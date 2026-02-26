@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // FIRESTORE LISTENERS
   // ======================
   try {
-    const { onSnapshot, doc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+    const { onSnapshot, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
 
     // ANNOUNCEMENT MODAL
     const announcementDoc = doc(db, "announcements", "current");
@@ -183,20 +183,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ======================
     const bellDoc = doc(db, "bellSchedules", "today");
 
-    async function updateCurrentPeriod() {
-  if (!periodsContainer) return;
-  try {
-    const snap = await getDoc(bellDoc);
-    if (!snap.exists()) {
-      periodsContainer.innerHTML = `<div class="current-period-card">No periods today</div>`;
-      return;
-    }
-    const periods = snap.data().periods || [];
-    const now = getCurrentESTDate();
-
-    // Find current period
-    const current = periods.find(p => isNowInPeriod(now, p.start, p.end));
-
     function formatTime(time24) {
       const [h, m] = time24.split(':').map(Number);
       const ampm = h >= 12 ? 'PM' : 'AM';
@@ -204,37 +190,51 @@ document.addEventListener('DOMContentLoaded', async function() {
       return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
     }
 
-    if (current) {
-      periodsContainer.innerHTML = `
-        <div class="current-period-card current">
-          <strong>Current Period:</strong> ${current.name} <br>
-          <span>${formatTime(current.start)} - ${formatTime(current.end)}</span>
-        </div>
-      `;
-    } else {
-      periodsContainer.innerHTML = `<div class="current-period-card">No ongoing period</div>`;
+    function isNowInPeriod(now, start, end) {
+      const [sH, sM] = start.split(':').map(Number);
+      const [eH, eM] = end.split(':').map(Number);
+      const startTime = new Date(now); startTime.setHours(sH, sM, 0, 0);
+      const endTime = new Date(now); endTime.setHours(eH, eM, 0, 0);
+      return now >= startTime && now <= endTime;
     }
-  } catch (err) {
-    console.error(err);
-  }
-}
 
-    // Initial render & interval
-    updateCurrentPeriod();
-    setInterval(updateCurrentPeriod, 60000);
-    onSnapshot(bellDoc, updateCurrentPeriod);
+    function updateCurrentPeriod(data) {
+      if (!periodsContainer) return;
+      const periods = data?.periods || [];
+      const now = getCurrentESTDate();
+      const current = periods.find(p => isNowInPeriod(now, p.start, p.end));
+
+      if (current) {
+        periodsContainer.innerHTML = `
+          <div class="current-period-card current">
+            <strong>Current Period:</strong> ${current.name} <br>
+            <span>${formatTime(current.start)} - ${formatTime(current.end)}</span>
+          </div>
+        `;
+      } else {
+        periodsContainer.innerHTML = `<div class="current-period-card">No ongoing period</div>`;
+      }
+    }
+
+    // Real-time listener
+    onSnapshot(bellDoc, (snap) => {
+      if (!snap.exists()) {
+        periodsContainer.innerHTML = `<div class="current-period-card">No periods today</div>`;
+        return;
+      }
+      updateCurrentPeriod(snap.data());
+    });
+
+    // Update every minute in case period changes
+    setInterval(() => {
+      getDoc(bellDoc).then(snap => {
+        if (snap.exists()) updateCurrentPeriod(snap.data());
+      });
+    }, 60000);
 
   } catch (err) {
     console.error("Firestore import or listener error:", err);
     if (dayTextEl) dayTextEl.textContent = "Connection Error";
-  }
-
-  function isNowInPeriod(now, start, end) {
-    const [sH, sM] = start.split(':').map(Number);
-    const [eH, eM] = end.split(':').map(Number);
-    const startTime = new Date(now); startTime.setHours(sH, sM, 0, 0);
-    const endTime = new Date(now); endTime.setHours(eH, eM, 0, 0);
-    return now >= startTime && now <= endTime;
   }
 
   // ======================
