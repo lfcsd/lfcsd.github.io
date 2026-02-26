@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   // ======================
   const menuBtn = document.getElementById('menuBtn');
   const dropdownMenu = document.getElementById('dropdownMenu');
-
   if (menuBtn && dropdownMenu) {
     menuBtn.addEventListener('click', () => {
       dropdownMenu.classList.toggle('show');
@@ -113,12 +112,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   // DAY CALCULATION
   // ======================
   const START_DATE = new Date('2025-10-13T00:00:00-05:00');
-
   function getCurrentESTDate() {
     const now = new Date();
     return new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
   }
-
   function calculateCurrentDay() {
     const estNow = getCurrentESTDate();
     const diffTime = estNow - START_DATE;
@@ -144,7 +141,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (announcementPopup) announcementPopup.classList.add('hidden');
       }
     });
-
     if (dismissAnnouncement && announcementPopup) {
       dismissAnnouncement.addEventListener('click', () => {
         announcementPopup.classList.add('hidden');
@@ -157,7 +153,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       const data = docSnap.data() || { manualDay: null, schedule: "Regular Day", autoMode: true };
       if (!dayTextEl || !specialScheduleEl) return;
 
-      // Clear
       dayTextEl.textContent = '';
       specialScheduleEl.innerHTML = '';
 
@@ -183,22 +178,51 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     });
 
-    // BELL SCHEDULE LIVE HIGHLIGHT
+    // ======================
+    // CURRENT PERIOD ONLY
+    // ======================
     const bellDoc = doc(db, "bellSchedules", "today");
-    onSnapshot(bellDoc, (snap) => {
-      if (!snap.exists() || !periodsContainer) return;
-      const data = snap.data();
-      const periods = data.periods || [];
-      periodsContainer.innerHTML = '';
-      const now = getCurrentESTDate();
-      periods.forEach(p => {
-        const bubble = document.createElement('div');
-        bubble.className = 'period-bubble';
-        bubble.textContent = `${p.name} ${p.start}-${p.end}`;
-        if (isNowInPeriod(now, p.start, p.end)) bubble.classList.add('current');
-        periodsContainer.appendChild(bubble);
-      });
-    });
+
+    async function updateCurrentPeriod() {
+  if (!periodsContainer) return;
+  try {
+    const snap = await getDoc(bellDoc);
+    if (!snap.exists()) {
+      periodsContainer.innerHTML = `<div class="current-period-card">No periods today</div>`;
+      return;
+    }
+    const periods = snap.data().periods || [];
+    const now = getCurrentESTDate();
+
+    // Find current period
+    const current = periods.find(p => isNowInPeriod(now, p.start, p.end));
+
+    function formatTime(time24) {
+      const [h, m] = time24.split(':').map(Number);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour12 = h % 12 === 0 ? 12 : h % 12;
+      return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
+    }
+
+    if (current) {
+      periodsContainer.innerHTML = `
+        <div class="current-period-card current">
+          <strong>Current Period:</strong> ${current.name} <br>
+          <span>${formatTime(current.start)} - ${formatTime(current.end)}</span>
+        </div>
+      `;
+    } else {
+      periodsContainer.innerHTML = `<div class="current-period-card">No ongoing period</div>`;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+    // Initial render & interval
+    updateCurrentPeriod();
+    setInterval(updateCurrentPeriod, 60000);
+    onSnapshot(bellDoc, updateCurrentPeriod);
 
   } catch (err) {
     console.error("Firestore import or listener error:", err);
