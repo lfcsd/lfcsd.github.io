@@ -39,6 +39,47 @@
 </head>
 <body>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>LFCSD Days</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon-lfcsd.png">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase SDK v9 -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.firebase = { db, app, firestore: { getFirestore } };
+  </script>
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({ appId: "b655dea8-a108-4112-9cbb-f5f6e3c9e012" });
+    });
+  </script>
+
+  <script src="script.js" type="module" defer></script>
+</head>
+<body>
+
 <!-- NAVBAR -->
 <nav class="navbar" role="navigation" aria-label="Main">
   <div class="nav-left">
@@ -46,6 +87,44 @@
     <span class="nav-title">LFCSD Days</span>
   </div>
 </nav>
+
+<!-- ANNOUNCEMENT MODAL -->
+<div id="announcementPopup" class="install-popup hidden" role="dialog" aria-modal="true" aria-label="Announcement">
+  <div class="popup-card announcement-card">
+    <div class="announcement-header">
+      <i class="fas fa-triangle-exclamation warning-icon"></i>
+      <h2 id="popupTitle">Announcement</h2>
+    </div>
+    <p class="muted" id="popupDescription"></p>
+    <div class="popup-actions">
+      <button id="dismissAnnouncement" class="dismiss">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CARD -->
+<main class="card">
+  <img src="/logo.png" class="main-logo" alt="logo">
+  <div id="specialSchedule"></div>
+  <div id="dayText" class="day-text">Loading...</div>
+  <div id="periodsContainer" class="periods-container"></div>
+  <div id="timeDisplay" class="time-display"></div>
+
+  <div class="controls-row">
+    <button id="reportBtn" class="pill report-pill">Incorrect?</button>
+  </div>
+</main>
+
+<footer class="footer">This website is not affiliated with LFCSD</footer>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/OneSignalSDKWorker.js');
+  }
+</script>
+
+</body>
+</html>
 
 <!-- ANNOUNCEMENT MODAL -->
 <div id="announcementPopup" class="install-popup hidden" role="dialog" aria-modal="true" aria-label="Announcement">
