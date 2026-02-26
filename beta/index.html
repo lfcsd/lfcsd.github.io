@@ -10,11 +10,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Firebase SDK v9 (modular version) -->
+  <!-- Firebase SDK v9 -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
-
     const firebaseConfig = {
       apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
       authDomain: "lfcsd-days.firebaseapp.com",
@@ -23,14 +22,11 @@
       messagingSenderId: "520576481150",
       appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     window.firebase = { db, app, firestore: { getFirestore } };
-    console.log("Firebase initialized successfully");
   </script>
 
-  <!-- OneSignal SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -51,11 +47,11 @@
   </div>
 </nav>
 
-<!-- ANNOUNCEMENT MODAL (Firestore-driven) -->
+<!-- ANNOUNCEMENT MODAL -->
 <div id="announcementPopup" class="install-popup hidden" role="dialog" aria-modal="true" aria-label="Announcement">
   <div class="popup-card announcement-card">
     <div class="announcement-header">
-      <i class="fas fa-triangle-exclamation warning-icon" style="color:white;font-size:1.5rem;"></i>
+      <i class="fas fa-triangle-exclamation warning-icon"></i>
       <h2 id="popupTitle">Announcement</h2>
     </div>
     <p class="muted" id="popupDescription"></p>
@@ -70,12 +66,12 @@
   <img src="/logo.png" class="main-logo" alt="logo">
   <div id="specialSchedule"></div>
   <div id="dayText" class="day-text">Loading...</div>
+  <div id="periodsContainer" class="periods-container"></div>
   <div id="timeDisplay" class="time-display"></div>
 
   <div class="controls-row">
-  <button id="reportBtn" class="pill report-pill">Incorrect?</button>
-</div>
-
+    <button id="reportBtn" class="pill report-pill">Incorrect?</button>
+  </div>
 </main>
 
 <footer class="footer">This website is not affiliated with LFCSD</footer>
