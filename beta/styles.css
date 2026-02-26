@@ -1,33 +1,84 @@
 /* GLOBAL RESET */
 * { box-sizing: border-box; margin:0; padding:0; }
-html, body { width:100%; height:100%; font-family:'Lexend',sans-serif; color:white; background: linear-gradient(135deg, #6a0dad, #8a2be2, #9370db); overflow-x:hidden; }
+html, body { 
+  width:100%; 
+  height:100%; 
+  font-family:'Lexend',sans-serif; 
+  color:white; 
+  background: linear-gradient(135deg, #6a0dad, #7b3fbf, #8a2be2, #9370db); 
+  overflow-x:hidden; 
+  background-size: 400% 400%;
+  animation: gradientBG 20s ease infinite;
+}
+
+/* Animate gradient subtly */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 /* NAVBAR */
-.navbar { position: fixed; top:0; left:0; height:60px; width:100%; padding:0 16px; background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); display:flex; align-items:center; z-index:2000; }
+.navbar { 
+  position: fixed; top:0; left:0; height:60px; width:100%; 
+  padding:0 16px; background: rgba(0,0,0,0.45); backdrop-filter: blur(14px); 
+  display:flex; align-items:center; z-index:2000; 
+}
 .nav-left { display:flex; align-items:center; gap:12px; }
 .nav-logo { height:38px; }
 .nav-title { font-weight:700; font-size:1.05rem; }
 
 /* MAIN CARD */
-.card { position:absolute; inset:0; top:60px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; }
+.card { 
+  position:absolute; inset:0; top:60px; display:flex; flex-direction:column; 
+  align-items:center; justify-content:center; gap:16px; text-align:center; 
+  padding:0 12px;
+}
 .main-logo { width:140px; }
-.day-text { font-size:4.5rem; font-weight:800; text-shadow:0 8px 20px rgba(0,0,0,0.4); }
+.day-text { font-size:4.5rem; font-weight:800; text-shadow:0 8px 20px rgba(0,0,0,0.45); }
 #specialSchedule { min-height:28px; }
-#specialSchedule span { background: rgba(0,0,0,0.45); padding:6px 18px; border-radius:20px; font-size:1.1rem; }
+#specialSchedule span { 
+  background: rgba(0,0,0,0.45); 
+  padding:6px 18px; 
+  border-radius:20px; 
+  font-size:1.1rem; 
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
 
 /* PERIODS */
-.periods-container { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:6px; }
-.period-bubble { padding:6px 12px; border-radius:16px; background: rgba(255,255,255,0.2); color:#ddd; font-weight:600; font-size:0.95rem; }
-.period-bubble.current { background: #ffffff33; color:white; font-weight:700; }
+.periods-container { 
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:6px; 
+}
+.period-bubble { 
+  padding:8px 16px; border-radius:18px; 
+  background: rgba(255,255,255,0.15); 
+  color:#eee; font-weight:600; font-size:1rem; 
+  backdrop-filter: blur(4px);
+  transition: all 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+.period-bubble.current, .current-period-card { 
+  background: rgba(255,255,255,0.25); 
+  color:white; 
+  font-weight:700; 
+  border: 1px solid rgba(255,255,255,0.3); 
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  border-radius:20px;
+  padding:12px 18px;
+  text-align:center;
+}
+.current-period-card strong { font-size:1.05rem; }
+.current-period-card span { font-size:0.95rem; opacity:0.9; }
 
 /* TIME DISPLAY */
-.time-display { margin-top:6px; font-size:1.05rem; opacity:0.9; }
+.time-display { margin-top:6px; font-size:1.1rem; opacity:0.9; text-shadow:0 2px 6px rgba(0,0,0,0.4); }
 
 /* CONTROLS */
 .controls-row { margin-top:14px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
 .pill { padding:10px 20px; border-radius:999px; border:none; cursor:pointer; font-weight:bold; transition: background 0.3s; }
-.report-pill { background: rgba(255,255,255,0.18); color:white; }
-.report-pill:hover { background: rgba(255,255,255,0.28); }
+.report-pill { background: rgba(255,255,255,0.2); color:white; }
+.report-pill:hover { background: rgba(255,255,255,0.32); }
 
 /* FOOTER */
 .footer { position: fixed; bottom:14px; width:100%; text-align:center; font-size:0.75rem; opacity:0.75; }
@@ -42,4 +93,8 @@ html, body { width:100%; height:100%; font-family:'Lexend',sans-serif; color:whi
 .muted { opacity:0.8; font-size:0.9rem; margin-top:6px; }
 
 /* MOBILE ADJUSTMENTS */
-@media (max-width:768px){ .day-text { font-size:3.2rem; } .main-logo { width:110px; } }
+@media (max-width:768px){ 
+  .day-text { font-size:3.2rem; } 
+  .main-logo { width:110px; } 
+  .period-bubble, .current-period-card { font-size:0.9rem; padding:8px 12px; }
+}
