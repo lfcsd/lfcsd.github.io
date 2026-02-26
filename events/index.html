@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>LFCSD Events</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon-lfcsd.png">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6yxt2JX4ubnFsiYf2stfdnHeqjNySiJc",
+      authDomain: "lfcsd-days.firebaseapp.com",
+      projectId: "lfcsd-days",
+      storageBucket: "lfcsd-days.appspot.com",
+      messagingSenderId: "520576481150",
+      appId: "1:520576481150:web:b08a50be7b0d15e113e52f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db;
+  </script>
+
+  <script type="module" src="events.js" defer></script>
+</head>
+
+<body>
+
+<!-- NAVBAR (same as main page) -->
+<nav class="navbar">
+  <div class="nav-left">
+    <img src="/logo.png" class="nav-logo">
+    <span class="nav-title">LFCSD Days</span>
+  </div>
+
+  <div class="nav-right">
+    <a href="/" class="events-btn">Back</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="card">
+  <img src="/logo.png" class="main-logo">
+
+  <div class="day-text" id="eventsTitle">Today's Events</div>
+
+  <div id="eventsList" class="events-list">
+    <div class="time-display">Loading events...</div>
+  </div>
+</main>
+
+<footer class="footer">This website is not affiliated with LFCSD</footer>
+
+</body>
+</html>
