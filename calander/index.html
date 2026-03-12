@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>LFCSD Calander</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" href="https://raw.githubusercontent.com/lfcsd/lfcsd.github.io/refs/heads/main/favicon-lfcsd.png">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/beta/styles.css">
+  <script type="module" src="calendar.js" defer></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="Main">
+  <div class="nav-left">
+    <img src="/logo.png" alt="LFCSD Logo" class="nav-logo">
+    <span class="nav-title">LFCSD Days</span>
+  </div>
+
+  <div class="nav-right">
+    <a href="/" class="events-btn">Back</a>
+  </div>
+</nav>
+
+<main class="card calendar-card-page">
+  <img src="/logo.png" class="main-logo" alt="logo">
+
+  <div class="calendar-header-row">
+    <button id="prevMonthBtn" class="calendar-nav-btn" aria-label="Previous month">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <div id="calendarTitle" class="day-text calendar-title">Loading...</div>
+
+    <button id="nextMonthBtn" class="calendar-nav-btn" aria-label="Next month">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <div class="calendar-legend">
+    <div class="legend-item">
+      <span class="legend-dot legend-half"></span>
+      <span>Half Day</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot legend-off"></span>
+      <span>No School</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot legend-conf"></span>
+      <span>Sup. Conf. / Special</span>
+    </div>
+  </div>
+
+  <div class="calendar-shell">
+    <div class="calendar-weekdays">
+      <div>Sun</div>
+      <div>Mon</div>
+      <div>Tue</div>
+      <div>Wed</div>
+      <div>Thu</div>
+      <div>Fri</div>
+      <div>Sat</div>
+    </div>
+
+    <div id="calendarGrid" class="calendar-grid"></div>
+  </div>
+
+  <div id="calendarNotes" class="calendar-notes"></div>
+</main>
+
+<footer class="footer">This website is not affiliated with LFCSD</footer>
+
+</body>
+</html>
