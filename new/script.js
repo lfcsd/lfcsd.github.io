@@ -12,12 +12,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // ELEMENTS
   // ======================
   const reportBtn = document.getElementById('reportBtn');
-  const nextDayBtn = document.createElement('button');
-  nextDayBtn.className = 'pill report-pill';
-  nextDayBtn.textContent = 'Next School Day';
-
-  if (reportBtn && reportBtn.parentNode) {
-    reportBtn.parentNode.insertBefore(nextDayBtn, reportBtn);
+  if (reportBtn) {
     reportBtn.textContent = 'Incorrect?';
   }
 
@@ -46,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // ======================
   let viewedDayOffset = 0;
   let currentSettingsData = { manualDay: null, schedule: "Regular Day", autoMode: true };
+  let latestBellData = null;
 
   // ======================
   // HELPERS
@@ -111,6 +107,47 @@ document.addEventListener('DOMContentLoaded', async function() {
     return ((currentDayNumber - 1 + viewedDayOffset) % 2) + 1;
   }
 
+  function formatTime(time24) {
+    const [h, m] = time24.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
+  }
+
+  function isNowInPeriod(now, start, end) {
+    const [sH, sM] = start.split(':').map(Number);
+    const [eH, eM] = end.split(':').map(Number);
+    const startTime = new Date(now);
+    startTime.setHours(sH, sM, 0, 0);
+    const endTime = new Date(now);
+    endTime.setHours(eH, eM, 0, 0);
+    return now >= startTime && now <= endTime;
+  }
+
+  function updateCurrentPeriod(data) {
+    if (!periodsContainer) return;
+
+    if (viewedDayOffset > 0) {
+      periodsContainer.innerHTML = `<div class="current-period-card">Viewing a future school day</div>`;
+      return;
+    }
+
+    const periods = data?.periods || [];
+    const now = getCurrentESTDate();
+    const current = periods.find(p => isNowInPeriod(now, p.start, p.end));
+
+    if (current) {
+      periodsContainer.innerHTML = `
+        <div class="current-period-card current">
+          <strong>Current Period:</strong> ${current.name} <br>
+          <span>${formatTime(current.start)} - ${formatTime(current.end)}</span>
+        </div>
+      `;
+    } else {
+      periodsContainer.innerHTML = `<div class="current-period-card">No ongoing period</div>`;
+    }
+  }
+
   function updateViewedDayUI() {
     if (!dayTextEl || !specialScheduleEl) return;
 
@@ -123,9 +160,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     badge.textContent = getWeekdayLabel(viewedDate);
     specialScheduleEl.appendChild(badge);
 
-    if (viewedDayOffset === 0 && isViewedWeekend) {
-      dayTextEl.textContent = 'No School';
-    } else if (isViewedWeekend) {
+    if (isViewedWeekend) {
       dayTextEl.textContent = 'No School';
     } else {
       dayTextEl.textContent = `Day ${getViewedDayNumber()}`;
@@ -133,6 +168,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (prevViewedDayBtn) {
       prevViewedDayBtn.classList.toggle('hidden', viewedDayOffset === 0);
+    }
+
+    if (latestBellData) {
+      updateCurrentPeriod(latestBellData);
     }
   }
 
@@ -201,16 +240,6 @@ document.addEventListener('DOMContentLoaded', async function() {
           alert('Failed to send report.');
         });
       }
-    });
-  }
-
-  // ======================
-  // NEXT SCHOOL DAY PILL
-  // ======================
-  if (nextDayBtn) {
-    nextDayBtn.addEventListener('click', () => {
-      viewedDayOffset++;
-      updateViewedDayUI();
     });
   }
 
@@ -433,68 +462,24 @@ document.addEventListener('DOMContentLoaded', async function() {
     // CURRENT PERIOD
     const bellDoc = doc(db, "bellSchedules", "today");
 
-    function formatTime(time24) {
-      const [h, m] = time24.split(':').map(Number);
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      const hour12 = h % 12 === 0 ? 12 : h % 12;
-      return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
-    }
-
-    function isNowInPeriod(now, start, end) {
-      const [sH, sM] = start.split(':').map(Number);
-      const [eH, eM] = end.split(':').map(Number);
-      const startTime = new Date(now);
-      startTime.setHours(sH, sM, 0, 0);
-      const endTime = new Date(now);
-      endTime.setHours(eH, eM, 0, 0);
-      return now >= startTime && now <= endTime;
-    }
-
-    function updateCurrentPeriod(data) {
-      if (!periodsContainer) return;
-
-      if (viewedDayOffset > 0) {
-        periodsContainer.innerHTML = `<div class="current-period-card">Viewing a future school day</div>`;
-        return;
-      }
-
-      const periods = data?.periods || [];
-      const now = getCurrentESTDate();
-      const current = periods.find(p => isNowInPeriod(now, p.start, p.end));
-
-      if (current) {
-        periodsContainer.innerHTML = `
-          <div class="current-period-card current">
-            <strong>Current Period:</strong> ${current.name} <br>
-            <span>${formatTime(current.start)} - ${formatTime(current.end)}</span>
-          </div>
-        `;
-      } else {
-        periodsContainer.innerHTML = `<div class="current-period-card">No ongoing period</div>`;
-      }
-    }
-
     onSnapshot(bellDoc, (snap) => {
       if (!snap.exists()) {
+        latestBellData = null;
         periodsContainer.innerHTML = `<div class="current-period-card">No periods today</div>`;
         return;
       }
 
-      updateCurrentPeriod(snap.data());
-
-      if (nextViewedDayBtn || prevViewedDayBtn || nextDayBtn) {
-        const originalUpdateViewedDayUI = updateViewedDayUI;
-        updateViewedDayUI = function() {
-          originalUpdateViewedDayUI();
-          updateCurrentPeriod(snap.data());
-        };
-        updateViewedDayUI();
-      }
+      latestBellData = snap.data();
+      updateCurrentPeriod(latestBellData);
+      updateViewedDayUI();
     });
 
     setInterval(() => {
       getDoc(bellDoc).then(snap => {
-        if (snap.exists()) updateCurrentPeriod(snap.data());
+        if (snap.exists()) {
+          latestBellData = snap.data();
+          updateCurrentPeriod(latestBellData);
+        }
       });
     }, 60000);
 
