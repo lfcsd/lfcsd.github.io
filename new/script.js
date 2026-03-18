@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   const nextDayBtn = document.createElement('button');
   nextDayBtn.className = 'pill report-pill';
   nextDayBtn.textContent = 'Next School Day';
+
   if (reportBtn && reportBtn.parentNode) {
     reportBtn.parentNode.insertBefore(nextDayBtn, reportBtn);
     reportBtn.textContent = 'Incorrect?';
@@ -30,12 +31,110 @@ document.addEventListener('DOMContentLoaded', async function() {
   const popupDescription = document.getElementById('popupDescription');
   const dismissAnnouncement = document.getElementById('dismissAnnouncement');
 
+  const prevViewedDayBtn = document.getElementById('prevViewedDayBtn');
+  const nextViewedDayBtn = document.getElementById('nextViewedDayBtn');
+
   // Calendar elements
   const calendarTitle = document.getElementById("calendarTitle");
   const calendarGrid = document.getElementById("calendarGrid");
   const calendarNotes = document.getElementById("calendarNotes");
   const prevMonthBtn = document.getElementById("prevMonthBtn");
   const nextMonthBtn = document.getElementById("nextMonthBtn");
+
+  // ======================
+  // STATE
+  // ======================
+  let viewedDayOffset = 0;
+  let currentSettingsData = { manualDay: null, schedule: "Regular Day", autoMode: true };
+
+  // ======================
+  // HELPERS
+  // ======================
+  function getCurrentESTDate() {
+    const now = new Date();
+    return new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  }
+
+  function cloneDate(date) {
+    return new Date(date.getTime());
+  }
+
+  function isWeekend(date) {
+    const d = date.getDay();
+    return d === 0 || d === 6;
+  }
+
+  function getWeekdayLabel(date) {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      timeZone: 'America/New_York'
+    });
+  }
+
+  function getViewedDateFromOffset(offset) {
+    const base = getCurrentESTDate();
+    const date = cloneDate(base);
+
+    if (offset === 0) return date;
+
+    let moved = 0;
+    while (moved < offset) {
+      date.setDate(date.getDate() + 1);
+      if (!isWeekend(date)) moved++;
+    }
+    return date;
+  }
+
+  const START_DATE = new Date('2025-10-13T00:00:00-05:00');
+
+  function calculateDayNumberForDate(targetDate) {
+    const normalizedTarget = new Date(targetDate);
+    normalizedTarget.setHours(0, 0, 0, 0);
+
+    const normalizedStart = new Date(START_DATE);
+    normalizedStart.setHours(0, 0, 0, 0);
+
+    const diffTime = normalizedTarget - normalizedStart;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return ((diffDays % 2) + 2) % 2 + 1;
+  }
+
+  function getCurrentConfiguredDayNumber() {
+    if (currentSettingsData.autoMode !== false && !currentSettingsData.manualDay) {
+      return calculateDayNumberForDate(getCurrentESTDate());
+    }
+    return currentSettingsData.manualDay || calculateDayNumberForDate(getCurrentESTDate());
+  }
+
+  function getViewedDayNumber() {
+    const currentDayNumber = getCurrentConfiguredDayNumber();
+    return ((currentDayNumber - 1 + viewedDayOffset) % 2) + 1;
+  }
+
+  function updateViewedDayUI() {
+    if (!dayTextEl || !specialScheduleEl) return;
+
+    const viewedDate = getViewedDateFromOffset(viewedDayOffset);
+    const isViewedWeekend = isWeekend(viewedDate);
+
+    specialScheduleEl.innerHTML = '';
+    const badge = document.createElement('span');
+    badge.className = 'schedule-badge';
+    badge.textContent = getWeekdayLabel(viewedDate);
+    specialScheduleEl.appendChild(badge);
+
+    if (viewedDayOffset === 0 && isViewedWeekend) {
+      dayTextEl.textContent = 'No School';
+    } else if (isViewedWeekend) {
+      dayTextEl.textContent = 'No School';
+    } else {
+      dayTextEl.textContent = `Day ${getViewedDayNumber()}`;
+    }
+
+    if (prevViewedDayBtn) {
+      prevViewedDayBtn.classList.toggle('hidden', viewedDayOffset === 0);
+    }
+  }
 
   // ======================
   // MENU BUTTON
@@ -47,10 +146,30 @@ document.addEventListener('DOMContentLoaded', async function() {
       dropdownMenu.classList.toggle('show');
       menuBtn.setAttribute("aria-expanded", dropdownMenu.classList.contains('show'));
     });
+
     document.addEventListener('click', (event) => {
       if (!menuBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
         dropdownMenu.classList.remove('show');
         menuBtn.setAttribute("aria-expanded", false);
+      }
+    });
+  }
+
+  // ======================
+  // VIEWED DAY NAV BUTTONS
+  // ======================
+  if (nextViewedDayBtn) {
+    nextViewedDayBtn.addEventListener('click', () => {
+      viewedDayOffset++;
+      updateViewedDayUI();
+    });
+  }
+
+  if (prevViewedDayBtn) {
+    prevViewedDayBtn.addEventListener('click', () => {
+      if (viewedDayOffset > 0) {
+        viewedDayOffset--;
+        updateViewedDayUI();
       }
     });
   }
@@ -70,6 +189,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             color: 0xff0000
           }]
         };
+
         fetch(webhookURL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -85,27 +205,12 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   // ======================
-  // NEXT DAY BUTTON
+  // NEXT SCHOOL DAY PILL
   // ======================
-  if (nextDayBtn && dayTextEl) {
-    nextDayBtn.addEventListener('click', async () => {
-      try {
-        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
-        const nextDayRef = doc(db, "settings", "nextDaySettings");
-        const docSnap = await getDoc(nextDayRef);
-        let nextDayNum = 1;
-
-        if (docSnap.exists()) {
-          nextDayNum = docSnap.data()?.manualDay || ((calculateCurrentDay() % 2) + 1);
-        } else {
-          nextDayNum = ((calculateCurrentDay() % 2) + 1);
-        }
-
-        dayTextEl.textContent = `Tomorrow will be a Day ${nextDayNum}`;
-      } catch (err) {
-        console.error(err);
-        dayTextEl.textContent = 'Unable to load next day';
-      }
+  if (nextDayBtn) {
+    nextDayBtn.addEventListener('click', () => {
+      viewedDayOffset++;
+      updateViewedDayUI();
     });
   }
 
@@ -128,36 +233,19 @@ document.addEventListener('DOMContentLoaded', async function() {
   setInterval(updateESTTime, 60000);
 
   // ======================
-  // DAY CALCULATION
-  // ======================
-  const START_DATE = new Date('2025-10-13T00:00:00-05:00');
-
-  function getCurrentESTDate() {
-    const now = new Date();
-    return new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  }
-
-  function calculateCurrentDay() {
-    const estNow = getCurrentESTDate();
-    const diffTime = estNow - START_DATE;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return (diffDays % 2) + 1;
-  }
-
-  // ======================
   // CALENDAR DATA
   // ======================
   const SCHOOL_MONTHS = [
-    { year: 2025, month: 8 },  // Sep
-    { year: 2025, month: 9 },  // Oct
-    { year: 2025, month: 10 }, // Nov
-    { year: 2025, month: 11 }, // Dec
-    { year: 2026, month: 0 },  // Jan
-    { year: 2026, month: 1 },  // Feb
-    { year: 2026, month: 2 },  // Mar
-    { year: 2026, month: 3 },  // Apr
-    { year: 2026, month: 4 },  // May
-    { year: 2026, month: 5 }   // Jun
+    { year: 2025, month: 8 },
+    { year: 2025, month: 9 },
+    { year: 2025, month: 10 },
+    { year: 2025, month: 11 },
+    { year: 2026, month: 0 },
+    { year: 2026, month: 1 },
+    { year: 2026, month: 2 },
+    { year: 2026, month: 3 },
+    { year: 2026, month: 4 },
+    { year: 2026, month: 5 }
   ];
 
   function key(y, m, d) {
@@ -172,7 +260,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   const SPECIAL_DATES = {};
 
-  /* NO SCHOOL / HOLIDAY / RECESS */
   SPECIAL_DATES[key(2025, 8, 1)]  = { type: "off",  label: "No School - Holiday" };
   SPECIAL_DATES[key(2025, 9, 13)] = { type: "off",  label: "No School - Holiday" };
   SPECIAL_DATES[key(2025, 10, 11)] = { type: "off", label: "No School - Holiday" };
@@ -185,7 +272,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   SPECIAL_DATES[key(2026, 4, 25)] = { type: "off", label: "No School - Holiday" };
   SPECIAL_DATES[key(2026, 5, 19)] = { type: "off", label: "No School - Holiday" };
 
-  /* HALF DAYS */
   SPECIAL_DATES[key(2025, 8, 19)] = { type: "half", label: "1/2 Day Students. Staff PD" };
   SPECIAL_DATES[key(2025, 9, 6)]  = { type: "half", label: "1/2 Day Students. Staff PD" };
   SPECIAL_DATES[key(2025, 9, 31)] = { type: "half", label: "1/2 Day Students. Staff PD" };
@@ -199,13 +285,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   SPECIAL_DATES[key(2026, 5, 24)] = { type: "half", label: "1/2 Day Students" };
   SPECIAL_DATES[key(2026, 5, 25)] = { type: "half", label: "1/2 Day Students" };
 
-  /* SUPERINTENDENT CONFERENCE / SPECIAL */
   SPECIAL_DATES[key(2025, 8, 2)] = { type: "conf", label: "Sup. Conf. Day - No School Students" };
   SPECIAL_DATES[key(2025, 8, 3)] = { type: "conf", label: "Sup. Conf. Day - No School Students" };
   SPECIAL_DATES[key(2026, 0, 23)] = { type: "conf", label: "Sup. Conf. Day - No School Students" };
   SPECIAL_DATES[key(2026, 5, 26)] = { type: "conf", label: "Graduation / Sup. Conf. Day & Regents Rating" };
 
-  /* OTHER NOTED SPECIAL DATE */
   SPECIAL_DATES[key(2025, 10, 25)] = { type: "conf", label: "Early Dismissal Drill - 15 min early" };
 
   function getInitialMonthIndex() {
@@ -342,29 +426,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     // CURRENT DAY LISTENER
     const currentDoc = doc(db, "settings", "current");
     onSnapshot(currentDoc, (docSnap) => {
-      const data = docSnap.data() || { manualDay: null, schedule: "Regular Day", autoMode: true };
-      if (!dayTextEl || !specialScheduleEl) return;
-
-      dayTextEl.textContent = '';
-      specialScheduleEl.innerHTML = '';
-
-      const today = new Date();
-      const dayOfWeek = today.getDay();
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        dayTextEl.textContent = 'No School';
-        return;
-      }
-
-      const badge = document.createElement('span');
-      badge.className = 'schedule-badge';
-      badge.textContent = data.schedule || 'Regular Day';
-      specialScheduleEl.appendChild(badge);
-
-      if (data.autoMode !== false && !data.manualDay) {
-        dayTextEl.textContent = `Day ${calculateCurrentDay()}`;
-      } else {
-        dayTextEl.textContent = `Day ${data.manualDay}`;
-      }
+      currentSettingsData = docSnap.data() || { manualDay: null, schedule: "Regular Day", autoMode: true };
+      updateViewedDayUI();
     });
 
     // CURRENT PERIOD
@@ -390,6 +453,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     function updateCurrentPeriod(data) {
       if (!periodsContainer) return;
 
+      if (viewedDayOffset > 0) {
+        periodsContainer.innerHTML = `<div class="current-period-card">Viewing a future school day</div>`;
+        return;
+      }
+
       const periods = data?.periods || [];
       const now = getCurrentESTDate();
       const current = periods.find(p => isNowInPeriod(now, p.start, p.end));
@@ -411,7 +479,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         periodsContainer.innerHTML = `<div class="current-period-card">No periods today</div>`;
         return;
       }
+
       updateCurrentPeriod(snap.data());
+
+      if (nextViewedDayBtn || prevViewedDayBtn || nextDayBtn) {
+        const originalUpdateViewedDayUI = updateViewedDayUI;
+        updateViewedDayUI = function() {
+          originalUpdateViewedDayUI();
+          updateCurrentPeriod(snap.data());
+        };
+        updateViewedDayUI();
+      }
     });
 
     setInterval(() => {
@@ -424,6 +502,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.error("Firestore import or listener error:", err);
     if (dayTextEl) dayTextEl.textContent = "Connection Error";
   }
+
+  updateViewedDayUI();
 
   // ======================
   // SERVICE WORKER
