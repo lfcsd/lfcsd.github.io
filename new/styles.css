@@ -122,10 +122,27 @@ html, body {
 /* LEFT SIDE CONTENT */
 .main-logo { width:140px; }
 
+.day-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+
 .day-text {
   font-size:4.5rem;
   font-weight:800;
   text-shadow:0 8px 20px rgba(0,0,0,0.45);
+  line-height: 1;
+}
+
+.day-nav-btn {
+  flex-shrink: 0;
+}
+
+.hidden {
+  display: none !important;
 }
 
 #specialSchedule { min-height:28px; }
@@ -561,6 +578,10 @@ html, body {
 
   .main-logo {
     width:110px;
+  }
+
+  .day-header-row {
+    gap: 10px;
   }
 
   .period-bubble,
