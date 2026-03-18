@@ -71,8 +71,21 @@
     <!-- LEFT -->
     <section class="home-left">
       <img src="/logo.png" class="main-logo" alt="logo">
+
       <div id="specialSchedule"></div>
-      <div id="dayText" class="day-text">Loading...</div>
+
+      <div class="day-header-row">
+        <button id="prevViewedDayBtn" class="calendar-nav-btn day-nav-btn hidden" aria-label="Previous viewed day">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div id="dayText" class="day-text">Loading...</div>
+
+        <button id="nextViewedDayBtn" class="calendar-nav-btn day-nav-btn" aria-label="Next viewed day">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
       <div id="periodsContainer" class="periods-container"></div>
       <div id="timeDisplay" class="time-display"></div>
 
