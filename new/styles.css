@@ -673,7 +673,6 @@ html, body {
   background: #2a2a2a;
 }
 
-/* CURRENT PERIOD CARD CAN OPEN SCHEDULE */
 .current-period-card.clickable {
   cursor: pointer;
 }
@@ -684,7 +683,11 @@ html, body {
   box-shadow: 0 10px 20px rgba(0,0,0,0.40);
 }
 
-/* SCHEDULE POPUP — match period bubble style */
+.period-popup-hint {
+  font-size: 0.82rem;
+  opacity: 0.82;
+}
+
 .schedule-popup-card {
   width: 92%;
   max-width: 460px;
@@ -758,20 +761,4 @@ html, body {
 .schedule-dismiss:active {
   transform: translateY(0);
   background: rgba(255,255,255,0.22);
-}
-
-@media (max-width: 768px) {
-  .schedule-popup-card {
-    padding: 18px;
-    border-radius: 20px;
-  }
-
-  .schedule-line {
-    border-radius: 16px;
-    padding: 10px 12px;
-  }
-
-  .schedule-popup-header h2 {
-    font-size: 1.15rem;
-  }
 }
