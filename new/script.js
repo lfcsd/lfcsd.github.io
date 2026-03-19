@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   const popupDescription = document.getElementById('popupDescription');
   const dismissAnnouncement = document.getElementById('dismissAnnouncement');
 
+  const schedulePopup = document.getElementById('schedulePopup');
+  const schedulePopupTitle = document.getElementById('schedulePopupTitle');
+  const schedulePopupBody = document.getElementById('schedulePopupBody');
+  const dismissSchedulePopup = document.getElementById('dismissSchedulePopup');
+
   const prevViewedDayBtn = document.getElementById('prevViewedDayBtn');
   const nextViewedDayBtn = document.getElementById('nextViewedDayBtn');
 
@@ -35,11 +40,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   const calendarNotes = document.getElementById("calendarNotes");
   const prevMonthBtn = document.getElementById("prevMonthBtn");
   const nextMonthBtn = document.getElementById("nextMonthBtn");
-
-  const schedulePopup = document.getElementById('schedulePopup');
-  const schedulePopupTitle = document.getElementById('schedulePopupTitle');
-  const schedulePopupBody = document.getElementById('schedulePopupBody');
-  const dismissSchedulePopup = document.getElementById('dismissSchedulePopup');
 
   // ======================
   // STATE
@@ -129,6 +129,72 @@ document.addEventListener('DOMContentLoaded', async function() {
     return now >= startTime && now <= endTime;
   }
 
+  function key(y, m, d) {
+    return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  }
+
+  function getDateKeyForDate(date) {
+    return key(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function getTodaySpecialInfo() {
+    const today = getCurrentESTDate();
+    return SPECIAL_DATES[getDateKeyForDate(today)] || null;
+  }
+
+  function isHalfDayForToday() {
+    const special = getTodaySpecialInfo();
+    if (special?.type === "half") return true;
+
+    const scheduleName = String(currentSettingsData?.schedule || '').toLowerCase();
+    return scheduleName.includes('half');
+  }
+
+  function getSchedulePopupTitle() {
+    return isHalfDayForToday() ? 'Half Day Schedule' : 'Regular Bell Schedule';
+  }
+
+  function openSchedulePopup() {
+    if (!schedulePopup || !schedulePopupBody || !schedulePopupTitle) return;
+    if (viewedDayOffset > 0) return;
+
+    const today = getCurrentESTDate();
+    const special = getTodaySpecialInfo();
+
+    if (isWeekend(today) || special?.type === "off" || special?.type === "conf") return;
+    if (!latestBellData?.periods?.length) return;
+
+    schedulePopupTitle.textContent = getSchedulePopupTitle();
+
+    schedulePopupBody.innerHTML = latestBellData.periods.map(period => `
+      <div class="schedule-line">
+        <div class="schedule-line-name">${period.name}</div>
+        <div class="schedule-line-time">${formatTime(period.start)} - ${formatTime(period.end)}</div>
+      </div>
+    `).join('');
+
+    schedulePopup.classList.remove('hidden');
+  }
+
+  function closeSchedulePopup() {
+    if (schedulePopup) {
+      schedulePopup.classList.add('hidden');
+    }
+  }
+
+  function attachCurrentPeriodPopupHandlers() {
+    const clickableCard = periodsContainer?.querySelector('.current-period-card.clickable');
+    if (!clickableCard) return;
+
+    clickableCard.addEventListener('click', openSchedulePopup);
+    clickableCard.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openSchedulePopup();
+      }
+    });
+  }
+
   function updateCurrentPeriod(data) {
     if (!periodsContainer) return;
 
@@ -137,20 +203,39 @@ document.addEventListener('DOMContentLoaded', async function() {
       return;
     }
 
+    const today = getCurrentESTDate();
+    const special = getTodaySpecialInfo();
+
+    if (isWeekend(today) || special?.type === "off" || special?.type === "conf") {
+      periodsContainer.innerHTML = `<div class="current-period-card">No periods today</div>`;
+      return;
+    }
+
     const periods = data?.periods || [];
-    const now = getCurrentESTDate();
-    const current = periods.find(p => isNowInPeriod(now, p.start, p.end));
+    const current = periods.find(p => isNowInPeriod(today, p.start, p.end));
+    const popupHint = `<br><span class="period-popup-hint">Tap to view full schedule</span>`;
 
     if (current) {
       periodsContainer.innerHTML = `
-        <div class="current-period-card current">
-          <strong>Current Period:</strong> ${current.name} <br>
+        <div class="current-period-card current clickable" role="button" tabindex="0" aria-label="Open today's full schedule">
+          <strong>Current Period:</strong> ${current.name}<br>
           <span>${formatTime(current.start)} - ${formatTime(current.end)}</span>
+          ${popupHint}
+        </div>
+      `;
+    } else if (periods.length) {
+      periodsContainer.innerHTML = `
+        <div class="current-period-card clickable" role="button" tabindex="0" aria-label="Open today's full schedule">
+          <strong>${getSchedulePopupTitle()}</strong><br>
+          <span>No ongoing period</span>
+          ${popupHint}
         </div>
       `;
     } else {
-      periodsContainer.innerHTML = `<div class="current-period-card">No ongoing period</div>`;
+      periodsContainer.innerHTML = `<div class="current-period-card">No periods today</div>`;
     }
+
+    attachCurrentPeriodPopupHandlers();
   }
 
   function updateViewedDayUI() {
@@ -205,6 +290,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (nextViewedDayBtn) {
     nextViewedDayBtn.addEventListener('click', () => {
       viewedDayOffset++;
+      closeSchedulePopup();
       updateViewedDayUI();
     });
   }
@@ -213,6 +299,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     prevViewedDayBtn.addEventListener('click', () => {
       if (viewedDayOffset > 0) {
         viewedDayOffset--;
+        closeSchedulePopup();
         updateViewedDayUI();
       }
     });
@@ -266,60 +353,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   updateESTTime();
   setInterval(updateESTTime, 60000);
 
-    function getDateKeyForDate(date) {
-    return key(date.getFullYear(), date.getMonth(), date.getDate());
-  }
-
-  function isHalfDayForDate(date) {
-    const dateKey = getDateKeyForDate(date);
-    const special = SPECIAL_DATES[dateKey];
-
-    if (special?.type === "half") return true;
-
-    const scheduleName = String(currentSettingsData?.schedule || '').toLowerCase();
-    return scheduleName.includes('half');
-  }
-
-  function isRegularDayForDate(date) {
-    const dateKey = getDateKeyForDate(date);
-    const special = SPECIAL_DATES[dateKey];
-    if (special?.type === "off" || special?.type === "conf") return false;
-    return !isHalfDayForDate(date);
-  }
-
-  function getSchedulePopupTitle(date) {
-    return isHalfDayForDate(date) ? 'Half Day Schedule' : 'Regular Bell Schedule';
-  }
-
-  function openSchedulePopup() {
-    if (!schedulePopup || !schedulePopupBody || !schedulePopupTitle) return;
-    if (viewedDayOffset > 0) return;
-
-    const today = getCurrentESTDate();
-    const dateKey = getDateKeyForDate(today);
-    const special = SPECIAL_DATES[dateKey];
-
-    if (isWeekend(today) || special?.type === "off" || special?.type === "conf") return;
-    if (!latestBellData?.periods?.length) return;
-
-    schedulePopupTitle.textContent = getSchedulePopupTitle(today);
-
-    schedulePopupBody.innerHTML = latestBellData.periods.map(period => `
-      <div class="schedule-line">
-        <div class="schedule-line-name">${period.name}</div>
-        <div class="schedule-line-time">${formatTime(period.start)} - ${formatTime(period.end)}</div>
-      </div>
-    `).join('');
-
-    schedulePopup.classList.remove('hidden');
-  }
-
-  function closeSchedulePopup() {
-    if (schedulePopup) {
-      schedulePopup.classList.add('hidden');
-    }
-  }
-
   // ======================
   // CALENDAR DATA
   // ======================
@@ -335,10 +368,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     { year: 2026, month: 4 },
     { year: 2026, month: 5 }
   ];
-
-  function key(y, m, d) {
-    return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-  }
 
   function addRange(map, year, month, startDay, endDay, type, label) {
     for (let d = startDay; d <= endDay; d++) {
@@ -483,6 +512,24 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     });
   }
+
+  if (dismissSchedulePopup) {
+    dismissSchedulePopup.addEventListener('click', closeSchedulePopup);
+  }
+
+  if (schedulePopup) {
+    schedulePopup.addEventListener('click', (e) => {
+      if (e.target === schedulePopup) {
+        closeSchedulePopup();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeSchedulePopup();
+    }
+  });
 
   renderMonth();
 
