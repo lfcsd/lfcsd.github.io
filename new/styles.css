@@ -672,3 +672,106 @@ html, body {
   transform: translateY(0);
   background: #2a2a2a;
 }
+
+/* CURRENT PERIOD CARD CAN OPEN SCHEDULE */
+.current-period-card.clickable {
+  cursor: pointer;
+}
+
+.current-period-card.clickable:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.30);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.40);
+}
+
+/* SCHEDULE POPUP — match period bubble style */
+.schedule-popup-card {
+  width: 92%;
+  max-width: 460px;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 24px;
+  padding: 22px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  text-align: center;
+}
+
+.schedule-popup-header {
+  margin-bottom: 14px;
+}
+
+.schedule-popup-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+.schedule-popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.schedule-line {
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 18px;
+  padding: 12px 14px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  text-align: left;
+}
+
+.schedule-line-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.schedule-line-time {
+  font-size: 0.92rem;
+  opacity: 0.9;
+}
+
+.schedule-dismiss {
+  background: rgba(255,255,255,0.18);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.26);
+  border-radius: 18px;
+  padding: 10px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.30);
+  transition: all 0.2s ease;
+}
+
+.schedule-dismiss:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.26);
+  border-color: rgba(255,255,255,0.34);
+}
+
+.schedule-dismiss:active {
+  transform: translateY(0);
+  background: rgba(255,255,255,0.22);
+}
+
+@media (max-width: 768px) {
+  .schedule-popup-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .schedule-line {
+    border-radius: 16px;
+    padding: 10px 12px;
+  }
+
+  .schedule-popup-header h2 {
+    font-size: 1.15rem;
+  }
+}
