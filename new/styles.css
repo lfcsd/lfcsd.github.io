@@ -243,12 +243,13 @@ html, body {
 /* ANNOUNCEMENT MODAL */
 .install-popup {
   position: fixed;
-  inset:0;
+  inset: 0;
+  padding: 16px;
   background: rgba(0,0,0,0.75);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
 }
 
 .install-popup.hidden { display:none; }
@@ -1364,8 +1365,9 @@ html, body {
 }
 
 .schedule-popup-card {
-  width: 92%;
-  max-width: 460px;
+  width: min(100%, 460px);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
   background: rgba(255,255,255,0.16);
   border: 1px solid rgba(255,255,255,0.28);
   border-radius: 24px;
@@ -1390,9 +1392,11 @@ html, body {
   flex-direction: column;
   gap: 10px;
   margin-top: 4px;
+  width: 100%;
 }
 
 .schedule-line {
+  width: 100%;
   background: rgba(255,255,255,0.14);
   border: 1px solid rgba(255,255,255,0.22);
   border-radius: 18px;
@@ -1400,6 +1404,7 @@ html, body {
   backdrop-filter: blur(8px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.25);
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .schedule-line-name {
@@ -1440,4 +1445,35 @@ html, body {
 .schedule-dismiss:active {
   transform: translateY(0);
   background: rgba(255,255,255,0.22);
+}
+
+@media (max-width: 768px) {
+  .install-popup {
+    padding: 12px;
+    align-items: center;
+  }
+
+  .schedule-popup-card {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .schedule-popup-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .schedule-line {
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .schedule-line-name {
+    font-size: 0.95rem;
+  }
+
+  .schedule-line-time {
+    font-size: 0.84rem;
+  }
 }
