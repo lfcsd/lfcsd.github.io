@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   function getSchedulePopupTitle() {
-    return isHalfDayForToday() ? 'Half Day Schedule' : 'Regular Bell Schedule';
+    return isHalfDayForToday() ? 'Current Bell Schedule' : 'Current Bell Schedule';
   }
 
   function openSchedulePopup() {
