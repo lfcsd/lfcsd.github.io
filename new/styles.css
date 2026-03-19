@@ -639,7 +639,7 @@ html, body {
 }
 
 /* Dismiss BUTTON — styled like current period bubble */
-.dismissAnnouncement {
+.dimsiss {
   text-decoration:none;
   background: rgba(255,255,255,0.25);
   color:white;
@@ -652,7 +652,7 @@ html, body {
   transition: all 0.25s ease;
 }
 
-.dismissAnnouncement:hover {
+.dismiss:hover {
   transform: translateY(-1px);
   background: rgba(255,255,255,0.32);
   box-shadow: 0 10px 20px rgba(0,0,0,0.45);
