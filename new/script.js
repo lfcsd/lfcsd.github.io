@@ -36,6 +36,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   const prevMonthBtn = document.getElementById("prevMonthBtn");
   const nextMonthBtn = document.getElementById("nextMonthBtn");
 
+  const schedulePopup = document.getElementById('schedulePopup');
+  const schedulePopupTitle = document.getElementById('schedulePopupTitle');
+  const schedulePopupBody = document.getElementById('schedulePopupBody');
+  const dismissSchedulePopup = document.getElementById('dismissSchedulePopup');
+
   // ======================
   // STATE
   // ======================
@@ -260,6 +265,60 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   updateESTTime();
   setInterval(updateESTTime, 60000);
+
+    function getDateKeyForDate(date) {
+    return key(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function isHalfDayForDate(date) {
+    const dateKey = getDateKeyForDate(date);
+    const special = SPECIAL_DATES[dateKey];
+
+    if (special?.type === "half") return true;
+
+    const scheduleName = String(currentSettingsData?.schedule || '').toLowerCase();
+    return scheduleName.includes('half');
+  }
+
+  function isRegularDayForDate(date) {
+    const dateKey = getDateKeyForDate(date);
+    const special = SPECIAL_DATES[dateKey];
+    if (special?.type === "off" || special?.type === "conf") return false;
+    return !isHalfDayForDate(date);
+  }
+
+  function getSchedulePopupTitle(date) {
+    return isHalfDayForDate(date) ? 'Half Day Schedule' : 'Regular Bell Schedule';
+  }
+
+  function openSchedulePopup() {
+    if (!schedulePopup || !schedulePopupBody || !schedulePopupTitle) return;
+    if (viewedDayOffset > 0) return;
+
+    const today = getCurrentESTDate();
+    const dateKey = getDateKeyForDate(today);
+    const special = SPECIAL_DATES[dateKey];
+
+    if (isWeekend(today) || special?.type === "off" || special?.type === "conf") return;
+    if (!latestBellData?.periods?.length) return;
+
+    schedulePopupTitle.textContent = getSchedulePopupTitle(today);
+
+    schedulePopupBody.innerHTML = latestBellData.periods.map(period => `
+      <div class="schedule-line">
+        <div class="schedule-line-name">${period.name}</div>
+        <div class="schedule-line-time">${formatTime(period.start)} - ${formatTime(period.end)}</div>
+      </div>
+    `).join('');
+
+    schedulePopup.classList.remove('hidden');
+  }
+
+  function closeSchedulePopup() {
+    if (schedulePopup) {
+      schedulePopup.classList.add('hidden');
+    }
+  }
 
   // ======================
   // CALENDAR DATA
