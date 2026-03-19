@@ -637,3 +637,23 @@ html, body {
     border-radius: 14px;
   }
 }
+
+/* Dismiss BUTTON — styled like current period bubble */
+.dismissAnnouncement {
+  text-decoration:none;
+  background: rgba(255,255,255,0.25);
+  color:white;
+  font-weight:700;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius:20px;
+  padding:8px 16px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  transition: all 0.25s ease;
+}
+
+.dismissAnnouncement:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.32);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.45);
+}
