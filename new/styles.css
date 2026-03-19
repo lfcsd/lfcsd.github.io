@@ -638,22 +638,40 @@ html, body {
   }
 }
 
-/* Dismiss BUTTON — styled like current period bubble */
-.dimsiss {
-  text-decoration:none;
-  background: rgba(255,255,255,0.25);
-  color:white;
-  font-weight:700;
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius:20px;
-  padding:8px 16px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
-  transition: all 0.25s ease;
+/* POPUP ACTIONS */
+.popup-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
 }
 
+/* DISMISS BUTTON — matches popup theme */
+.dismiss {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 10px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.45);
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+/* hover */
 .dismiss:hover {
+  background: #222;
+  border-color: rgba(255,255,255,0.16);
   transform: translateY(-1px);
+}
+
+/* click */
+.dismiss:active {
+  transform: translateY(0);
+  background: #2a2a2a;
+}
   background: rgba(255,255,255,0.32);
   box-shadow: 0 10px 20px rgba(0,0,0,0.45);
 }
