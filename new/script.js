@@ -386,8 +386,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   addRange(SPECIAL_DATES, 2026, 1, 16, 20, "off", "Mid Winter Recess");
   SPECIAL_DATES[key(2026, 3, 3)] = { type: "off", label: "Spring Recess" };
   addRange(SPECIAL_DATES, 2026, 3, 6, 10, "off", "Spring Recess");
-  SPECIAL_DATES[key(2026, 4, 25)] = { type: "off", label: "No School - Holiday" };
   SPECIAL_DATES[key(2026, 4, 22)] = { type: "off", label: "No School - Unused Snow Day" }; // May 22
+  SPECIAL_DATES[key(2026, 4, 25)] = { type: "off", label: "No School - Holiday" };
   SPECIAL_DATES[key(2026, 5, 19)] = { type: "off", label: "No School - Holiday" };
   
 
